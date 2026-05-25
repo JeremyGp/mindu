@@ -80,16 +80,16 @@
             <div id="ai-banner" class="mb-gutter bg-gradient-to-r from-zinc-900 to-black text-white p-6 rounded-lg shadow-sm border border-zinc-800 transition-all duration-300">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div class="flex items-start gap-4">
-                        <div class="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center flex-shrink-0 animate-pulse">
+                        <div class="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center flex-shrink-0">
                             <span class="material-symbols-outlined text-white text-[26px]">psychology</span>
                         </div>
                         <div>
                             <h4 class="text-[16px] font-bold font-manrope">¿Quieres agendar más rápido?</h4>
-                            <p class="text-[13px] text-zinc-400 max-w-xl">Nuestra IA analizó tus patrones de triaje y síntomas recientes. Tenemos una recomendación óptima de especialista y horario para ti.</p>
+                            <p class="text-[13px] text-zinc-400 max-w-xl">Nuestra IA analizará tus métricas emocionales y de triaje recientes para asignarte instantáneamente el horario y especialista ideal.</p>
                         </div>
                     </div>
                     <button id="btn-ia-auto" class="w-full md:w-auto px-6 py-3 bg-white text-black font-button-text text-[12px] font-bold rounded uppercase tracking-wider hover:bg-zinc-200 transition-all active:scale-95 flex items-center justify-center gap-2">
-                        <span>Usar Recomendación IA</span>
+                        <span>Generar Recomendación IA</span>
                         <span class="material-symbols-outlined text-[16px]">magic_button</span>
                     </button>
                 </div>
@@ -101,12 +101,12 @@
                     
                     <div id="ai-loading" class="absolute inset-0 bg-white/90 backdrop-blur-sm z-30 hidden flex-col items-center justify-center gap-3 transition-all">
                         <div class="w-12 h-12 border-4 border-black border-t-transparent rounded-full animate-spin"></div>
-                        <p class="text-body-sm font-bold text-primary tracking-wide font-manrope">IA Analizando disponibilidad clínica...</p>
+                        <p class="text-body-sm font-bold text-primary tracking-wide font-manrope">IA buscando coincidencias en tiempo real...</p>
                     </div>
 
                     <h3 class="font-headline-md text-headline-md mb-6 border-b border-surface-container pb-4 flex justify-between items-center">
                         <span>Detalles de la Cita</span>
-                        <span id="ai-badge" class="hidden text-[10px] font-extrabold bg-green-100 text-green-800 px-2 py-1 rounded tracking-wider uppercase font-manrope">Optimizado por IA</span>
+                        <span id="ai-badge" class="hidden text-[10px] font-extrabold bg-green-100 text-green-800 px-2 py-1 rounded tracking-wider uppercase font-manrope">Optimizado por IA ✨</span>
                     </h3>
 
                     <form id="form-cita" class="space-y-stack-md">
@@ -209,15 +209,11 @@
             </div>
 
             <div class="mt-stack-lg border-t border-surface-container pt-stack-md">
-                <h4 class="font-label-caps text-label-caps text-secondary uppercase mb-4">Sesiones Anteriores</h4>
-                <div class="flex flex-wrap gap-4">
+                <h4 class="font-label-caps text-label-caps text-secondary uppercase mb-4">Tus Sesiones Agendadas</h4>
+                <div id="lista-citas" class="flex flex-wrap gap-4">
                     <div class="bg-white px-4 py-2 rounded-full border border-surface-container flex items-center gap-2">
-                        <span class="w-2 h-2 rounded-full bg-primary"></span>
-                        <span class="text-body-sm text-primary">12 Oct 2023 - Virtual</span>
-                    </div>
-                    <div class="bg-white px-4 py-2 rounded-full border border-surface-container flex items-center gap-2">
-                        <span class="w-2 h-2 rounded-full bg-primary"></span>
-                        <span class="text-body-sm text-primary">28 Sep 2023 - Presencial</span>
+                        <span class="w-2 h-2 rounded-full bg-zinc-400"></span>
+                        <span class="text-body-sm text-secondary">12 Oct 2023 - Virtual</span>
                     </div>
                 </div>
             </div>
@@ -227,13 +223,47 @@
 </div>
 
 <script>
+    // --- BANCO DE DATOS ALEATORIO PARA LA IA ---
+    const basePsicologos = [
+        {
+            nombre: "Dra. Elena Rodriguez",
+            especialidad: "Especialista Cognitivo Conductual • Ansiedad",
+            modalidad: "virtual",
+            texto: "Seleccionamos a la Dra. Elena basándonos en tu último triaje (bucle de ansiedad del 74%). Su enfoque te ayudará con la dispersión cognitiva actual.",
+            foto: "https://lh3.googleusercontent.com/aida-public/AB6AXuBIwuCsK6JkND3yOvimMCljeC0buQrh7b7KREBjOW-GGnQi4imOiYo1jlGQQir_1laMmzOt_3pp0WB2d2PoeHJP4BhvsRfSdLlH2vskwh8zfgUXQAYmdXWO_t7FWJ6qRP71FcE9ac2CFd_41mXXj9cG4Zhk9MdH_CA-GiCkuLQctNC7wQjlukV3vBLORha3mzVFrTB8mrTkj6HzLQ3tiPTF6dbeVs3fUnxHeANUbJAkQSl_s5L4r0YSl_TedcHU2hJvBQTSZBr2kpg"
+        },
+        {
+            nombre: "Dr. Marcos Venegas",
+            especialidad: "Terapeuta Familiar • Manejo del Estrés Crónico",
+            modalidad: "presencial",
+            texto: "El Dr. Marcos tiene alta compatibilidad debido a tus niveles de estrés laboral reportados en tu seguimiento de hábitos. Recomendamos modalidad presencial.",
+            foto: "https://lh3.googleusercontent.com/aida-public/AB6AXuDJu_JVp6Rt2Fd_tSC5SUhGthyIX3cbdTT_3yqUYeuNYt2IEpeUpYwp0gvcU2YbpqWs4nMZute87EXaF2sPngS9M0RNiXt-kdVdqB2wzG3hN5w9mAlRAf0l92AS3qtqJs9V0lRbMvhAk5ewBv3ao0cs5FJ3nS9j-r9KuDTR994SEUfjLHH6syufi-Eowph4RWyOe5VNGKAlMxZNG0VEF1JMZqZJXEOupr3Ku4DW_BNfCW0m1waLfIUfr22vGVSA9nWedP7Q_KO7hgI"
+        },
+        {
+            nombre: "Dra. Sofía Alva",
+            especialidad: "Psicóloga Clínica • Especialista en Trastornos del Sueño",
+            modalidad: "virtual",
+            texto: "Asignada automáticamente debido a tu alerta de insomnio (menos de 6 horas de sueño acumuladas). Te enseñará técnicas de higiene del sueño.",
+            foto: "https://lh3.googleusercontent.com/aida-public/AB6AXuBIwuCsK6JkND3yOvimMCljeC0buQrh7b7KREBjOW-GGnQi4imOiYo1jlGQQir_1laMmzOt_3pp0WB2d2PoeHJP4BhvsRfSdLlH2vskwh8zfgUXQAYmdXWO_t7FWJ6qRP71FcE9ac2CFd_41mXXj9cG4Zhk9MdH_CA-GiCkuLQctNC7wQjlukV3vBLORha3mzVFrTB8mrTkj6HzLQ3tiPTF6dbeVs3fUnxHeANUbJAkQSl_s5L4r0YSl_TedcHU2hJvBQTSZBr2kpg"
+        }
+    ];
+
+    // Datos por defecto (Para cuando la página vuelva a la normalidad)
+    const psicologoPorDefecto = {
+        nombre: "Dr. Carlos Martinez",
+        especialidad: "Psicólogo Clínico • TCC Specialist",
+        dispo: "Hoy, 16:30",
+        foto: "https://lh3.googleusercontent.com/aida-public/AB6AXuBIwuCsK6JkND3yOvimMCljeC0buQrh7b7KREBjOW-GGnQi4imOiYo1jlGQQir_1laMmzOt_3pp0WB2d2PoeHJP4BhvsRfSdLlH2vskwh8zfgUXQAYmdXWO_t7FWJ6qRP71FcE9ac2CFd_41mXXj9cG4Zhk9MdH_CA-GiCkuLQctNC7wQjlukV3vBLORha3mzVFrTB8mrTkj6HzLQ3tiPTF6dbeVs3fUnxHeANUbJAkQSl_s5L4r0YSl_TedcHU2hJvBQTSZBr2kpg",
+        recoTitulo: "RECOMENDACIÓN",
+        recoTexto: "Para tu sesión virtual, asegúrate de estar en un espacio privado con conexión estable. Recomendamos entrar 5 minutos antes para probar audio y video."
+    };
+
     const radioVirtual = document.getElementById('radio-virtual');
     const radioPresencial = document.getElementById('radio-presencial');
     const labelVirtual = document.getElementById('label-virtual');
     const labelPresencial = document.getElementById('label-presencial');
     const mapContainer = document.getElementById('map-container');
 
-    // Función para pintar visualmente los Radio Buttons estilo Card
     function actualizarDisenoModalidad() {
         if (radioVirtual.checked) {
             labelVirtual.classList.add('border-primary', 'bg-white');
@@ -246,51 +276,88 @@
         }
     }
 
-    // Escuchar cambios manuales
     radioVirtual.addEventListener('change', actualizarDisenoModalidad);
     radioPresencial.addEventListener('change', actualizarDisenoModalidad);
-
-    // inicializar diseño de tarjetas al cargar
     actualizarDisenoModalidad();
 
-    // --- INTERACCIÓN CON LA IA (Simulación Completa de Criterio de Aceptación) ---
+    // --- LÓGICA DE RECOMENDACIÓN ALEATORIA DE IA ---
     document.getElementById('btn-ia-auto').addEventListener('click', () => {
         const loading = document.getElementById('ai-loading');
-        loading.classList.remove('hidden'); // Mostrar pantalla de carga rápida
+        loading.classList.remove('hidden'); 
         
         setTimeout(() => {
-            loading.classList.add('hidden'); // Ocultar carga despues de 1.2s
+            loading.classList.add('hidden'); 
             
-            // 1. Modificar los campos del formulario dinámicamente
-            document.getElementById('input-fecha').value = "2026-05-26"; // Fecha simulada sugerida
-            document.getElementById('input-hora').value = "10:30";
+            // Elegir un psicólogo del banco de datos al azar
+            const psicologoElegido = basePsicologos[Math.floor(Math.random() * basePsicologos.length)];
             
-            // 2. Cambiar modalidad a Virtual de manera inteligente
-            radioVirtual.checked = true;
+            // Generar fechas y horas automáticas realistas
+            const hoy = new Date();
+            hoy.setDate(hoy.getDate() + Math.floor(Math.random() * 4) + 1); // 1 a 4 días en el futuro
+            const fechaString = hoy.toISOString().split('T')[0];
+            const horasDisponibles = ["09:00", "11:30", "15:00", "17:30"];
+            const horaString = horasDisponibles[Math.floor(Math.random() * horasDisponibles.length)];
+
+            // Autocompletar formulario
+            document.getElementById('input-fecha').value = fechaString;
+            document.getElementById('input-hora').value = horaString;
+            
+            // Asignar modalidad recomendada
+            if(psicologoElegido.modalidad === 'virtual') {
+                radioVirtual.checked = true;
+            } else {
+                radioPresencial.checked = true;
+            }
             actualizarDisenoModalidad();
 
-            // 3. Modificar la tarjeta del Psicólogo de la derecha (Simulando asignación por IA)
-            document.getElementById('nombre-psicologo').innerText = "Dra. Elena Rodriguez";
-            document.getElementById('especialidad-psicologo').innerText = "Especialista Cognitivo Conductual • Experta en Ansiedad";
-            document.getElementById('dispo-psicologo').innerText = "Martes 26, 10:30 AM (Reservado)";
-            document.getElementById('foto-psicologo').src = "https://lh3.googleusercontent.com/aida-public/AB6AXuBIwuCsK6JkND3yOvimMCljeC0buQrh7b7KREBjOW-GGnQi4imOiYo1jlGQQir_1laMmzOt_3pp0WB2d2PoeHJP4BhvsRfSdLlH2vskwh8zfgUXQAYmdXWO_t7FWJ6qRP71FcE9ac2CFd_41mXXj9cG4Zhk9MdH_CA-GiCkuLQctNC7wQjlukV3vBLORha3mzVFrTB8mrTkj6HzLQ3tiPTF6dbeVs3fUnxHeANUbJAkQSl_s5L4r0YSl_TedcHU2hJvBQTSZBr2kpg"; // Cambia al avatar femenino
+            // Modificar la tarjeta visual del psicólogo
+            document.getElementById('nombre-psicologo').innerText = psicologoElegido.nombre;
+            document.getElementById('especialidad-psicologo').innerText = psicologoElegido.especialidad;
+            document.getElementById('dispo-psicologo').innerText = `${fechaString} a las ${horaString} hrs`;
+            document.getElementById('foto-psicologo').src = psicologoElegido.foto;
             
-            // 4. Cambiar el cuadro de Recomendación a modo IA
-            document.getElementById('reco-titulo').innerText = "RECOMENDACIÓN DE IA OPTIMIZADA";
-            document.getElementById('reco-texto').innerText = "Seleccionamos a la Dra. Elena basándonos en tu último análisis de triaje clínico (bucle de ansiedad del 74%). Este horario reduce tu tiempo de espera en un 80%.";
+            // Modificar cuadro informativo de recomendación
+            document.getElementById('reco-titulo').innerText = "RECOMENDACIÓN OPTIMIZADA POR IA ✨";
+            document.getElementById('reco-texto').innerText = psicologoElegido.texto;
 
-            // 5. Mostrar la insignia verde de éxito de IA
+            // Mostrar el badge verde de IA activa
             document.getElementById('ai-badge').classList.remove('hidden');
-            
-            // 6. Hacer desaparecer el banner superior con un efecto limpio
-            document.getElementById('ai-banner').classList.add('opacity-40', 'pointer-events-none');
-        }, 1200);
+        }, 1000);
     });
 
-    // Manejar envío del formulario final
+    // --- REBOTAR LA PÁGINA A LA NORMALIDAD AL AGENDAR ---
     document.getElementById('form-cita').addEventListener('submit', (e) => {
         e.preventDefault();
-        alert('¡Cita Confirmada Exitosamente en el Sistema MindU!');
+        
+        const fecha = document.getElementById('input-fecha').value;
+        const hora = document.getElementById('input-hora').value;
+        const doctor = document.getElementById('nombre-psicologo').innerText;
+        const mod = radioVirtual.checked ? 'Virtual' : 'Presencial';
+
+        alert(`¡Cita con ${doctor} agendada con éxito para el ${fecha} a las ${hora} (${mod})!`);
+
+        // Insertar visualmente la nueva cita en la lista inferior de forma dinámica
+        const lista = document.getElementById('lista-citas');
+        const nuevaCitaNode = document.createElement('div');
+        nuevaCitaNode.className = "bg-white px-4 py-2 rounded-full border border-primary flex items-center gap-2 animate-bounce";
+        nuevaCitaNode.innerHTML = `<span class="w-2 h-2 rounded-full bg-primary"></span><span class="text-body-sm text-primary font-bold">${fecha} - ${mod} (${doctor})</span>`;
+        lista.insertBefore(nuevaCitaNode, lista.firstChild);
+
+        // VOLVER LA PÁGINA A LA NORMALIDAD (Resetear valores)
+        document.getElementById('form-cita').reset();
+        document.getElementById('ai-badge').classList.add('hidden');
+        document.getElementById('ai-banner').classList.remove('opacity-40', 'pointer-events-none');
+        
+        // Restablecer tarjeta del psicólogo inicial por defecto
+        document.getElementById('nombre-psicologo').innerText = psicologoPorDefecto.nombre;
+        document.getElementById('especialidad-psicologo').innerText = psicologoPorDefecto.especialidad;
+        document.getElementById('dispo-psicologo').innerText = psicologoPorDefecto.dispo;
+        document.getElementById('foto-psicologo').src = psicologoPorDefecto.foto;
+        document.getElementById('reco-titulo').innerText = psicologoPorDefecto.recoTitulo;
+        document.getElementById('reco-texto').innerText = psicologoPorDefecto.recoTexto;
+        
+        radioVirtual.checked = true;
+        actualizarDisenoModalidad();
     });
 </script>
 
