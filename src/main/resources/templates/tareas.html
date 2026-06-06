@@ -22,8 +22,25 @@
                 <span class="material-symbols-outlined">notifications</span>
                 <span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
             </button>
-            <div class="h-8 w-8 rounded-full overflow-hidden border border-zinc-200">
-                <img alt="User profile avatar" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDJu_JVp6Rt2Fd_tSC5SUhGthyIX3cbdTT_3yqUYeuNYt2IEpeUpYwp0gvcU2YbpqWs4nMZute87EXaF2sPngS9M0RNiXt-kdVdqB2wzG3hN5w9mAlRAf0l92AS3qtqJs9V0lRbMvhAk5ewBv3ao0cs5FJ3nS9j-r9KuDTR994SEUfjLHH6syufi-Eowph4RWyOe5VNGKAlMxZNG0VEF1JMZqZJXEOupr3Ku4DW_BNfCW0m1waLfIUfr22vGVSA9nWedP7Q_KO7hgI"/>
+            
+            <div class="relative">
+                <button id="botonPerfil" class="flex items-center focus:outline-none transition-transform active:scale-95">
+                    <div class="h-8 w-8 rounded-full overflow-hidden border border-zinc-200">
+                        <img alt="User profile avatar" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDJu_JVp6Rt2Fd_tSC5SUhGthyIX3cbdTT_3yqUYeuNYt2IEpeUpYwp0gvcU2YbpqWs4nMZute87EXaF2sPngS9M0RNiXt-kdVdqB2wzG3hN5w9mAlRAf0l92AS3qtqJs9V0lRbMvhAk5ewBv3ao0cs5FJ3nS9j-r9KuDTR994SEUfjLHH6syufi-Eowph4RWyOe5VNGKAlMxZNG0VEF1JMZqZJXEOupr3Ku4DW_BNfCW0m1waLfIUfr22vGVSA9nWedP7Q_KO7hgI"/>
+                    </div>
+                </button>
+
+                <div id="menuDesplegable" class="hidden absolute right-0 mt-2 w-48 bg-white border border-zinc-200 rounded-lg shadow-lg py-1 z-50 animate-fade-in">
+                    <a href="ajustes.html" class="flex items-center px-4 py-2.5 text-sm text-zinc-700 hover:bg-zinc-50 transition-colors">
+                        <span class="material-symbols-outlined mr-2 text-[18px] text-zinc-500">account_circle</span>
+                        Ver perfil
+                    </a>
+                    <hr class="border-zinc-100 my-1">
+                    <button id="botonCerrarSesion" class="w-full flex items-center px-4 py-2.5 text-sm text-error hover:bg-red-50 transition-colors text-left">
+                        <span class="material-symbols-outlined mr-2 text-[18px] text-error">logout</span>
+                        Cerrar sesión
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -62,9 +79,9 @@
                 <span class="font-label-caps text-label-caps">Notificaciones</span>
             </a>
 
-            <a class="flex items-center px-margin py-3 text-secondary hover:bg-surface-container-high transition-all active:scale-95 duration-200" href="ajustes.html">
+            <a class="flex items-center px-margin py-3 text-secondary hover:bg-surface-container-high transition-all active:scale-95 duration-200" href="configuracion.html">
                 <span class="material-symbols-outlined mr-3">settings</span>
-                <span class="font-label-caps text-label-caps">Ajustes</span>
+                <span class="font-label-caps text-label-caps">Configuración</span>
             </a>
         </nav>
         
@@ -255,5 +272,31 @@
     </main>
 </div>
 
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const botonPerfil = document.getElementById('botonPerfil');
+        const menuDesplegable = document.getElementById('menuDesplegable');
+        const botonCerrarSesion = document.getElementById('botonCerrarSesion');
+
+        // Alternar visualización del menú al hacer clic en el avatar
+        botonPerfil.addEventListener('click', (e) => {
+            e.stopPropagation();
+            menuDesplegable.classList.toggle('hidden');
+        });
+
+        // Ocultar menú al hacer clic en cualquier otra parte de la pantalla
+        document.addEventListener('click', () => {
+            if (!menuDesplegable.classList.contains('hidden')) {
+                menuDesplegable.classList.add('hidden');
+            }
+        });
+
+        // Redirección lógica para simular cierre de sesión hacia login.html
+        botonCerrarSesion.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.href = 'login.html';
+        });
+    });
+</script>
 </body>
 </html>

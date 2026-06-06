@@ -1,234 +1,280 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Seguimiento de Hábitos - MindU</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-    
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+
     <link rel="stylesheet" href="../static/style/style.css">
 </head>
+
 <body class="font-body-lg text-on-surface bg-background">
 
-<header class="flex fixed top-0 left-0 right-0 z-50 justify-between items-center px-8 h-16 bg-white border-b border-zinc-200 font-manrope antialiased tracking-tight">
-    <div class="flex items-center gap-stack-md">
-        <span class="text-xl font-extrabold tracking-tighter text-black">MindU</span>
-    </div>
-    <div class="flex items-center gap-6">
-        <div class="flex items-center gap-4">
-            <button class="relative p-2 text-zinc-600 hover:bg-zinc-100 rounded-full transition-colors">
-                <span class="material-symbols-outlined">notifications</span>
-                <span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
-            </button>
-            <div class="h-8 w-8 rounded-full overflow-hidden border border-zinc-200">
-                <img alt="User profile avatar" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDJu_JVp6Rt2Fd_tSC5SUhGthyIX3cbdTT_3yqUYeuNYt2IEpeUpYwp0gvcU2YbpqWs4nMZute87EXaF2sPngS9M0RNiXt-kdVdqB2wzG3hN5w9mAlRAf0l92AS3qtqJs9V0lRbMvhAk5ewBv3ao0cs5FJ3nS9j-r9KuDTR994SEUfjLHH6syufi-Eowph4RWyOe5VNGKAlMxZNG0VEF1JMZqZJXEOupr3Ku4DW_BNfCW0m1waLfIUfr22vGVSA9nWedP7Q_KO7hgI"/>
-            </div>
+    <header class="flex fixed top-0 left-0 right-0 z-50 justify-between items-center px-8 h-16 bg-white border-b border-zinc-200 font-manrope antialiased tracking-tight">
+        <div class="flex items-center gap-stack-md">
+            <span class="text-xl font-extrabold tracking-tighter text-black">MindU</span>
         </div>
-    </div>
-</header>
-
-<div class="flex pt-16">
-    <aside class="h-[calc(100vh-64px)] w-64 fixed left-0 top-16 flex flex-col bg-surface border-r border-surface-container py-stack-md z-40">
-        <nav class="flex-grow flex flex-col">
-            <a class="flex items-center px-margin py-3 text-secondary hover:bg-surface-container-high transition-all active:scale-95 duration-200" href="panelPrincipal.html">
-                <span class="material-symbols-outlined mr-3">dashboard</span>
-                <span class="font-label-caps text-label-caps">Panel Principal</span>
-            </a>
-            
-            <a class="flex items-center px-margin py-3 text-secondary hover:bg-surface-container-high transition-all active:scale-95 duration-200" href="citas.html">
-                <span class="material-symbols-outlined mr-3">calendar_month</span>
-                <span class="font-label-caps text-label-caps">Citas</span>
-            </a>
-
-            <a class="flex items-center px-margin py-3 text-secondary hover:bg-surface-container-high transition-all active:scale-95 duration-200" href="triaje.html">
-                <span class="material-symbols-outlined mr-3">psychology</span>
-                <span class="font-label-caps text-label-caps">Triaje IA</span>
-            </a>
-
-            <a class="flex items-center px-margin py-3 text-secondary hover:bg-surface-container-high transition-all active:scale-95 duration-200" href="tareas.html">
-                <span class="material-symbols-outlined mr-3">assignment</span>
-                <span class="font-label-caps text-label-caps">Tareas TCC</span>
-            </a>
-
-            <a class="flex items-center px-margin py-3 text-secondary hover:bg-surface-container-high transition-all active:scale-95 duration-200 active-tab" href="habitos.html">
-                <span class="material-symbols-outlined mr-3">event_note</span>
-                <span class="font-label-caps text-label-caps">Seguimiento de Hábitos</span>
-            </a>
-
-            <a class="flex items-center px-margin py-3 text-secondary hover:bg-surface-container-high transition-all active:scale-95 duration-200" href="notificaciones.html">
-                <span class="material-symbols-outlined mr-3">notifications</span>
-                <span class="font-label-caps text-label-caps">Notificaciones</span>
-            </a>
-
-            <a class="flex items-center px-margin py-3 text-secondary hover:bg-surface-container-high transition-all active:scale-95 duration-200" href="ajustes.html">
-                <span class="material-symbols-outlined mr-3">settings</span>
-                <span class="font-label-caps text-label-caps">Ajustes</span>
-            </a>
-        </nav>
-        
-        <div class="px-margin mt-auto pt-stack-md space-y-2">
-            <button class="w-full bg-error text-on-error font-button-text text-button-text py-3 rounded uppercase tracking-wider hover:opacity-90 transition-opacity">
-                SOS Emergency
-            </button>
-            <div class="pt-4 border-t border-surface-container"></div>
-        </div>
-    </aside>
-
-    <main class="flex-grow ml-64 p-margin min-h-screen">
-        <div class="max-w-[1200px] mx-auto">
-            
-            <div class="mb-stack-lg font-manrope">
-                <h2 class="font-headline-lg text-headline-lg text-primary mb-1">Seguimiento de Hábitos</h2>
-                <p class="text-body-sm text-secondary">Registra tus patrones diarios para identificar cómo afectan tu bienestar emocional. La consistencia es clave para el equilibrio.</p>
-            </div>
-
-            <div class="mb-gutter flex items-start gap-4 p-5 bg-surface-container-low border border-surface-container rounded-lg">
-                <span class="material-symbols-outlined text-primary mt-0.5">info</span>
-                <div>
-                    <h4 class="text-body-sm font-bold text-primary uppercase tracking-wider text-[11px] mb-0.5">ALERTA PREVENTIVA</h4>
-                    <p class="text-[13px] text-secondary leading-relaxed">Has dormido menos de 6 horas los últimos 3 días, intenta descansar hoy. El sueño adecuado es fundamental para la regulación emocional.</p>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-12 gap-gutter">
+        <div class="flex items-center gap-6">
+            <div class="flex items-center gap-4">
+                <button class="relative p-2 text-zinc-600 hover:bg-zinc-100 rounded-full transition-colors">
+                    <span class="material-symbols-outlined">notifications</span>
+                    <span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
+                </button>
                 
-                <div class="col-span-12 lg:col-span-8 bg-white border border-surface-container-highest p-stack-md rounded-lg flex flex-col justify-between">
-                    <div>
-                        <div class="flex justify-between items-center mb-6">
-                            <h3 class="font-headline-md text-[18px] text-primary flex items-center gap-2">
-                                <span class="material-symbols-outlined text-[20px]">bedtime</span> Calidad del Sueño
-                            </h3>
-                            <span class="text-[10px] font-bold text-secondary bg-surface-container px-2 py-0.5 rounded uppercase">HOY</span>
+                <div class="relative">
+                    <button id="botonPerfil" class="flex items-center focus:outline-none transition-transform active:scale-95">
+                        <div class="h-8 w-8 rounded-full overflow-hidden border border-zinc-200">
+                            <img alt="User profile avatar" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDJu_JVp6Rt2Fd_tSC5SUhGthyIX3cbdTT_3yqUYeuNYt2IEpeUpYwp0gvcU2YbpqWs4nMZute87EXaF2sPngS9M0RNiXt-kdVdqB2wzG3hN5w9mAlRAf0l92AS3qtqJs9V0lRbMvhAk5ewBv3ao0cs5FJ3nS9j-r9KuDTR994SEUfjLHH6syufi-Eowph4RWyOe5VNGKAlMxZNG0VEF1JMZqZJXEOupr3Ku4DW_BNfCW0m1waLfIUfr22vGVSA9nWedP7Q_KO7hgI"/>
                         </div>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                            <div>
-                                <label class="block text-[11px] font-bold text-secondary uppercase mb-2">Horas Dormidas</label>
-                                <input type="text" value="5.5" class="w-full bg-surface-container-low border border-surface-container rounded p-3 text-body-sm text-primary font-medium focus:ring-1 focus:ring-primary outline-none" />
-                            </div>
-                            <div>
-                                <label class="block text-[11px] font-bold text-secondary uppercase mb-2">Calidad</label>
-                                <div class="relative">
-                                    <select class="w-full bg-surface-container-low border border-surface-container rounded p-3 text-body-sm text-primary font-medium focus:ring-1 focus:ring-primary outline-none appearance-none cursor-pointer">
-                                        <option value="baja" selected>Baja</option>
-                                        <option value="media">Media</option>
-                                        <option value="alta">Alta</option>
-                                    </select>
-                                    <span class="material-symbols-outlined absolute right-3 top-3.5 text-secondary pointer-events-none text-[18px]">keyboard_arrow_down</span>
-                                </div>
-                            </div>
-                        </div>
+                    </button>
 
-                        <div>
-                            <label class="block text-[11px] font-bold text-secondary uppercase mb-3">Progreso Semanal</label>
-                            <div class="flex gap-2">
-                                <div class="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center text-[11px] font-bold">L</div>
-                                <div class="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center text-[11px] font-bold">M</div>
-                                <div class="w-8 h-8 rounded-full bg-surface-container border border-surface-container-highest text-secondary flex items-center justify-center text-[11px]">X</div>
-                                <div class="w-8 h-8 rounded-full bg-surface-container border border-surface-container-highest text-secondary flex items-center justify-center text-[11px]">J</div>
-                                <div class="w-8 h-8 rounded-full bg-surface-container border border-surface-container-highest text-secondary flex items-center justify-center text-[11px]">V</div>
-                                <div class="w-8 h-8 rounded-full bg-surface-container border border-surface-container-highest text-secondary flex items-center justify-center text-[11px]">S</div>
-                                <div class="w-8 h-8 rounded-full bg-surface-container border border-surface-container-highest text-secondary flex items-center justify-center text-[11px]">D</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-span-12 lg:col-span-4 bg-white border border-surface-container-highest p-stack-md rounded-lg">
-                    <h3 class="font-headline-md text-[18px] text-primary flex items-center gap-2 mb-2">
-                        <span class="material-symbols-outlined text-[20px]">battery_charging_full</span> Energía
-                    </h3>
-                    <p class="text-[13px] text-secondary mb-6">¿Cómo te sientes en este momento?</p>
-                    
-                    <div class="space-y-3">
-                        <label class="flex justify-between items-center p-4 border border-surface-container rounded-lg cursor-pointer hover:bg-surface-container-low transition-colors">
-                            <span class="text-body-sm font-medium text-primary">Alto</span>
-                            <input type="radio" name="energia_status" class="w-4 h-4 text-primary focus:ring-primary border-surface-container-highest" />
-                        </label>
-                        <label class="flex justify-between items-center p-4 border border-surface-container rounded-lg cursor-pointer hover:bg-surface-container-low transition-colors">
-                            <span class="text-body-sm font-medium text-primary">Medio</span>
-                            <input type="radio" name="energia_status" class="w-4 h-4 text-primary focus:ring-primary border-surface-container-highest" />
-                        </label>
-                        <label class="flex justify-between items-center p-4 border-2 border-primary rounded-lg bg-surface-container-low/30 cursor-pointer">
-                            <span class="text-body-sm font-bold text-primary">Bajo</span>
-                            <div class="w-4 h-4 rounded-full bg-primary flex items-center justify-center">
-                                <div class="w-1.5 h-1.5 bg-white rounded-full"></div>
-                            </div>
-                        </label>
-                    </div>
-                </div>
-
-                <div class="col-span-12 lg:col-span-6 bg-white border border-surface-container-highest p-stack-md rounded-lg flex flex-col justify-between min-h-[220px]">
-                    <div>
-                        <h3 class="font-headline-md text-[18px] text-primary flex items-center gap-2 mb-4">
-                            <span class="material-symbols-outlined text-[20px]">directions_run</span> Actividad Diaria
-                        </h3>
-                        <div class="mb-4">
-                            <span class="text-headline-lg font-bold text-primary text-[32px]">4,230</span>
-                            <span class="text-body-sm text-secondary"> / 8,000 PASOS</span>
-                        </div>
-                        
-                        <div class="w-full bg-surface-container rounded-full h-2.5 mb-2">
-                            <div class="bg-black h-2.5 rounded-full" style="width: 53%"></div>
-                        </div>
-                    </div>
-                    <div class="pt-4">
-                        <button class="w-full bg-surface-container hover:bg-surface-container-high text-primary font-button-text text-button-text py-3 rounded transition-colors uppercase tracking-wider text-[12px]">
-                            Registrar Ejercicio Adicional
+                    <div id="menuDesplegable" class="hidden absolute right-0 mt-2 w-48 bg-white border border-zinc-200 rounded-lg shadow-lg py-1 z-50 animate-fade-in">
+                        <a href="ajustes.html" class="flex items-center px-4 py-2.5 text-sm text-zinc-700 hover:bg-zinc-50 transition-colors">
+                            <span class="material-symbols-outlined mr-2 text-[18px] text-zinc-500">account_circle</span>
+                            Ver perfil
+                        </a>
+                        <hr class="border-zinc-100 my-1">
+                        <button id="botonCerrarSesion" class="w-full flex items-center px-4 py-2.5 text-sm text-error hover:bg-red-50 transition-colors text-left">
+                            <span class="material-symbols-outlined mr-2 text-[18px] text-error">logout</span>
+                            Cerrar sesión
                         </button>
                     </div>
                 </div>
+            </div>
+        </div>
+    </header>
 
-                <div class="col-span-12 lg:col-span-6 bg-white border border-surface-container-highest p-stack-md rounded-lg flex flex-col justify-between min-h-[220px]">
+    <div class="flex pt-16">
+        <aside class="h-[calc(100vh-64px)] w-64 fixed left-0 top-16 flex flex-col bg-surface border-r border-surface-container py-stack-md z-40">
+            <nav class="flex-grow flex flex-col">
+                <a class="flex items-center px-margin py-3 text-secondary hover:bg-surface-container-high transition-all active:scale-95 duration-200" href="panelPrincipal.html">
+                    <span class="material-symbols-outlined mr-3">dashboard</span>
+                    <span class="font-label-caps text-label-caps">Panel Principal</span>
+                </a>
+                
+                <a class="flex items-center px-margin py-3 text-secondary hover:bg-surface-container-high transition-all active:scale-95 duration-200" href="citas.html">
+                    <span class="material-symbols-outlined mr-3">calendar_month</span>
+                    <span class="font-label-caps text-label-caps">Citas</span>
+                </a>
+
+                <a class="flex items-center px-margin py-3 text-secondary hover:bg-surface-container-high transition-all active:scale-95 duration-200" href="triaje.html">
+                    <span class="material-symbols-outlined mr-3">psychology</span>
+                    <span class="font-label-caps text-label-caps">Triaje IA</span>
+                </a>
+
+                <a class="flex items-center px-margin py-3 text-secondary hover:bg-surface-container-high transition-all active:scale-95 duration-200" href="tareas.html">
+                    <span class="material-symbols-outlined mr-3">assignment</span>
+                    <span class="font-label-caps text-label-caps">Tareas TCC</span>
+                </a>
+
+                <a class="flex items-center px-margin py-3 text-secondary hover:bg-surface-container-high transition-all active:scale-95 duration-200 active-tab" href="habitos.html">
+                    <span class="material-symbols-outlined mr-3">event_note</span>
+                    <span class="font-label-caps text-label-caps">Seguimiento de Hábitos</span>
+                </a>
+
+                <a class="flex items-center px-margin py-3 text-secondary hover:bg-surface-container-high transition-all active:scale-95 duration-200" href="notificaciones.html">
+                    <span class="material-symbols-outlined mr-3">notifications</span>
+                    <span class="font-label-caps text-label-caps">Notificaciones</span>
+                </a>
+
+                <a class="flex items-center px-margin py-3 text-secondary hover:bg-surface-container-high transition-all active:scale-95 duration-200" href="configuracion.html">
+                    <span class="material-symbols-outlined mr-3">settings</span>
+                    <span class="font-label-caps text-label-caps">Configuración</span>
+                </a>
+            </nav>
+            
+            <div class="px-margin mt-auto pt-stack-md space-y-2">
+                <button class="w-full bg-error text-on-error font-button-text text-button-text py-3 rounded uppercase tracking-wider hover:opacity-90 transition-opacity">
+                    SOS Emergency
+                </button>
+                <div class="pt-4 border-t border-surface-container"></div>
+            </div>
+        </aside>
+
+        <main class="flex-grow ml-64 p-margin min-h-screen">
+            <div class="max-w-[1200px] mx-auto">
+
+                <div class="mb-stack-lg font-manrope">
+                    <h2 class="font-headline-lg text-headline-lg text-primary mb-1">Seguimiento de Hábitos</h2>
+                    <p class="text-body-sm text-secondary">Registra tus patrones diarios para identificar cómo afectan tu bienestar emocional. La consistencia es clave para el equilibrio.</p>
+                </div>
+
+                <div class="mb-gutter flex items-start gap-4 p-5 bg-surface-container-low border border-surface-container rounded-lg">
+                    <span class="material-symbols-outlined text-primary mt-0.5">info</span>
                     <div>
-                        <h3 class="font-headline-md text-[18px] text-primary flex items-center gap-2 mb-6">
-                            <span class="material-symbols-outlined text-[20px]">restaurant</span> Enfoque Nutricional
-                        </h3>
-                        
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="space-y-3">
-                                <span class="block text-[10px] font-bold text-secondary uppercase tracking-wider mb-1">Comidas</span>
-                                <label class="flex items-center gap-3 cursor-pointer">
-                                    <input type="checkbox" checked class="rounded text-primary focus:ring-primary border-surface-container-highest w-4 h-4" />
-                                    <span class="text-body-sm text-primary">Desayuno</span>
-                                </label>
-                                <label class="flex items-center gap-3 cursor-pointer">
-                                    <input type="checkbox" checked class="rounded text-primary focus:ring-primary border-surface-container-highest w-4 h-4" />
-                                    <span class="text-body-sm text-primary">Aluerzo</span>
-                                </label>
-                                <label class="flex items-center gap-3 cursor-pointer">
-                                    <input type="checkbox" class="rounded text-primary focus:ring-primary border-surface-container-highest w-4 h-4" />
-                                    <span class="text-body-sm text-secondary">Cena</span>
-                                </label>
-                            </div>
-
-                            <div class="space-y-2">
-                                <span class="block text-[10px] font-bold text-secondary uppercase tracking-wider mb-1">Hidratación</span>
-                                <div class="flex gap-1.5 text-primary">
-                                    <span class="material-symbols-outlined style-fill text-[22px]">water_drop</span>
-                                    <span class="material-symbols-outlined style-fill text-[22px]">water_drop</span>
-                                    <span class="material-symbols-outlined style-fill text-[22px]">water_drop</span>
-                                    <span class="material-symbols-outlined text-surface-container-highest text-[22px]">water_drop</span>
-                                    <span class="material-symbols-outlined text-surface-container-highest text-[22px]">water_drop</span>
-                                </div>
-                                <p class="text-[12px] text-secondary pt-1">3 de 8 vasos</p>
-                            </div>
-                        </div>
+                        <h4 class="text-body-sm font-bold text-primary uppercase tracking-wider text-[11px] mb-0.5">ALERTA PREVENTIVA</h4>
+                        <p class="text-[13px] text-secondary leading-relaxed">Has dormido menos de 6 horas los últimos 3 días, intenta descansar hoy. El sueño adecuado es fundamental para la regulación emocional.</p>
                     </div>
                 </div>
 
+                <div class="grid grid-cols-12 gap-gutter">
+
+                    <div class="col-span-12 lg:col-span-8 bg-white border border-surface-container-highest p-stack-md rounded-lg flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between items-center mb-6">
+                                <h3 class="font-headline-md text-[18px] text-primary flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-[20px]">bedtime</span> Calidad del Sueño
+                                </h3>
+                                <span class="text-[10px] font-bold text-secondary bg-surface-container px-2 py-0.5 rounded uppercase">HOY</span>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                                <div>
+                                    <label class="block text-[11px] font-bold text-secondary uppercase mb-2">Horas Dormidas</label>
+                                    <input type="text" value="5.5" class="w-full bg-surface-container-low border border-surface-container rounded p-3 text-body-sm text-primary font-medium focus:ring-1 focus:ring-primary outline-none" />
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-bold text-secondary uppercase mb-2">Calidad</label>
+                                    <div class="relative">
+                                        <select class="w-full bg-surface-container-low border border-surface-container rounded p-3 text-body-sm text-primary font-medium focus:ring-1 focus:ring-primary outline-none appearance-none cursor-pointer">
+                                            <option value="baja" selected>Baja</option>
+                                            <option value="media">Media</option>
+                                            <option value="alta">Alta</option>
+                                        </select>
+                                        <span class="material-symbols-outlined absolute right-3 top-3.5 text-secondary pointer-events-none text-[18px]">keyboard_arrow_down</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-[11px] font-bold text-secondary uppercase mb-3">Progreso Semanal</label>
+                                <div class="flex gap-2">
+                                    <div class="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center text-[11px] font-bold">L</div>
+                                    <div class="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center text-[11px] font-bold">M</div>
+                                    <div class="w-8 h-8 rounded-full bg-surface-container border border-surface-container-highest text-secondary flex items-center justify-center text-[11px]">X</div>
+                                    <div class="w-8 h-8 rounded-full bg-surface-container border border-surface-container-highest text-secondary flex items-center justify-center text-[11px]">J</div>
+                                    <div class="w-8 h-8 rounded-full bg-surface-container border border-surface-container-highest text-secondary flex items-center justify-center text-[11px]">V</div>
+                                    <div class="w-8 h-8 rounded-full bg-surface-container border border-surface-container-highest text-secondary flex items-center justify-center text-[11px]">S</div>
+                                    <div class="w-8 h-8 rounded-full bg-surface-container border border-surface-container-highest text-secondary flex items-center justify-center text-[11px]">D</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-span-12 lg:col-span-4 bg-white border border-surface-container-highest p-stack-md rounded-lg">
+                        <h3 class="font-headline-md text-[18px] text-primary flex items-center gap-2 mb-2">
+                            <span class="material-symbols-outlined text-[20px]">battery_charging_full</span> Energía
+                        </h3>
+                        <p class="text-[13px] text-secondary mb-6">¿Cómo te sientes en este momento?</p>
+
+                        <div class="space-y-3">
+                            <label class="flex justify-between items-center p-4 border border-surface-container rounded-lg cursor-pointer hover:bg-surface-container-low transition-colors">
+                                <span class="text-body-sm font-medium text-primary">Alto</span>
+                                <input type="radio" name="energia_status" class="w-4 h-4 text-primary focus:ring-primary border-surface-container-highest" />
+                            </label>
+                            <label class="flex justify-between items-center p-4 border border-surface-container rounded-lg cursor-pointer hover:bg-surface-container-low transition-colors">
+                                <span class="text-body-sm font-medium text-primary">Medio</span>
+                                <input type="radio" name="energia_status" class="w-4 h-4 text-primary focus:ring-primary border-surface-container-highest" />
+                            </label>
+                            <label class="flex justify-between items-center p-4 border-2 border-primary rounded-lg bg-surface-container-low/30 cursor-pointer">
+                                <span class="text-body-sm font-bold text-primary">Bajo</span>
+                                <div class="w-4 h-4 rounded-full bg-primary flex items-center justify-center">
+                                    <div class="w-1.5 h-1.5 bg-white rounded-full"></div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="col-span-12 lg:col-span-6 bg-white border border-surface-container-highest p-stack-md rounded-lg flex flex-col justify-between min-h-[220px]">
+                        <div>
+                            <h3 class="font-headline-md text-[18px] text-primary flex items-center gap-2 mb-4">
+                                <span class="material-symbols-outlined text-[20px]">directions_run</span> Actividad Diaria
+                            </h3>
+                            <div class="mb-4">
+                                <span class="text-headline-lg font-bold text-primary text-[32px]">4,230</span>
+                                <span class="text-body-sm text-secondary"> / 8,000 PASOS</span>
+                            </div>
+
+                            <div class="w-full bg-surface-container rounded-full h-2.5 mb-2">
+                                <div class="bg-black h-2.5 rounded-full" style="width: 53%"></div>
+                            </div>
+                        </div>
+                        <div class="pt-4">
+                            <button class="w-full bg-surface-container hover:bg-surface-container-high text-primary font-button-text text-button-text py-3 rounded transition-colors uppercase tracking-wider text-[12px]">
+                                Registrar Ejercicio Adicional
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="col-span-12 lg:col-span-6 bg-white border border-surface-container-highest p-stack-md rounded-lg flex flex-col justify-between min-h-[220px]">
+                        <div>
+                            <h3 class="font-headline-md text-[18px] text-primary flex items-center gap-2 mb-6">
+                                <span class="material-symbols-outlined text-[20px]">restaurant</span> Enfoque Nutricional
+                            </h3>
+
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="space-y-3">
+                                    <span class="block text-[10px] font-bold text-secondary uppercase tracking-wider mb-1">Comidas</span>
+                                    <label class="flex items-center gap-3 cursor-pointer">
+                                        <input type="checkbox" checked class="rounded text-primary focus:ring-primary border-surface-container-highest w-4 h-4" />
+                                        <span class="text-body-sm text-primary">Desayuno</span>
+                                    </label>
+                                    <label class="flex items-center gap-3 cursor-pointer">
+                                        <input type="checkbox" checked class="rounded text-primary focus:ring-primary border-surface-container-highest w-4 h-4" />
+                                        <span class="text-body-sm text-primary">Almuerzo</span>
+                                    </label>
+                                    <label class="flex items-center gap-3 cursor-pointer">
+                                        <input type="checkbox" class="rounded text-primary focus:ring-primary border-surface-container-highest w-4 h-4" />
+                                        <span class="text-body-sm text-secondary">Cena</span>
+                                    </label>
+                                </div>
+
+                                <div class="space-y-2">
+                                    <span class="block text-[10px] font-bold text-secondary uppercase tracking-wider mb-1">Hidratación</span>
+                                    <div class="flex gap-1.5 text-primary">
+                                        <span class="material-symbols-outlined style-fill text-[22px]">water_drop</span>
+                                        <span class="material-symbols-outlined style-fill text-[22px]">water_drop</span>
+                                        <span class="material-symbols-outlined style-fill text-[22px]">water_drop</span>
+                                        <span class="material-symbols-outlined text-surface-container-highest text-[22px]">water_drop</span>
+                                        <span class="material-symbols-outlined text-surface-container-highest text-[22px]">water_drop</span>
+                                    </div>
+                                    <p class="text-[12px] text-secondary pt-1">3 de 8 vasos</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
             </div>
-        </div>
-    </main>
-</div>
+        </main>
+    </div>
 
-<style>
-    .style-fill {
-        font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-    }
-</style>
+    <style>
+        .style-fill {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const botonPerfil = document.getElementById('botonPerfil');
+            const menuDesplegable = document.getElementById('menuDesplegable');
+            const botonCerrarSesion = document.getElementById('botonCerrarSesion');
+
+            // Alternar la visibilidad del menú al hacer clic en el avatar
+            botonPerfil.addEventListener('click', (e) => {
+                e.stopPropagation(); // Evita que el evento cierre el menú inmediatamente
+                menuDesplegable.classList.toggle('hidden');
+            });
+
+            // Cerrar el menú si se hace clic en cualquier otra parte de la pantalla
+            document.addEventListener('click', (e) => {
+                if (!menuDesplegable.classList.contains('hidden')) {
+                    menuDesplegable.classList.add('hidden');
+                }
+            });
+
+            // Evento para simular el cierre de sesión y redirigir a login.html
+            botonCerrarSesion.addEventListener('click', (e) => {
+                e.preventDefault();
+                window.location.href = 'login.html';
+            });
+        });
+    </script>
 </body>
+
 </html>
