@@ -56,13 +56,29 @@ public class UsuarioService {
         Usuario usuario = usuarioRepository.findByCorreo(request.getCorreo())
                 .orElseThrow(() -> new IllegalArgumentException("Credenciales incorrectas"));
 
+        // Verificar si la cuenta está temporalmente bloqueada
+        if (usuario.getBloqueadoHasta() != null && usuario.getBloqueadoHasta().isAfter(LocalDateTime.now())) {
+            throw new IllegalArgumentException("La cuenta está temporalmente bloqueada por demasiados intentos fallidos. Intente de nuevo más tarde.");
+        }
+
         if (!passwordEncoder.matches(request.getPassword(), usuario.getPassword())) {
+            int intentos = usuario.getIntentosFallidos() == null ? 0 : usuario.getIntentosFallidos();
+            usuario.setIntentosFallidos(intentos + 1);
+            if (usuario.getIntentosFallidos() >= 5) {
+                usuario.setBloqueadoHasta(LocalDateTime.now().plusMinutes(15));
+            }
+            usuarioRepository.save(usuario);
             throw new IllegalArgumentException("Credenciales incorrectas");
         }
 
         if (!usuario.getActivo()) {
             throw new IllegalArgumentException("La cuenta está desactivada");
         }
+
+        // Restablecer intentos fallidos tras inicio de sesión exitoso
+        usuario.setIntentosFallidos(0);
+        usuario.setBloqueadoHasta(null);
+        usuarioRepository.save(usuario);
 
         String token = jwtUtil.generarToken(usuario.getCorreo(), usuario.getRol().name());
         return new AuthResponse(token, usuario.getNombre(), usuario.getCorreo(), usuario.getRol().name());

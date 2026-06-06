@@ -39,4 +39,10 @@ public abstract class Usuario {
     @Column(nullable = false)
     protected LocalDateTime fechaRegistro;
 
+    @Column(nullable = false, columnDefinition = "integer default 0")
+    protected Integer intentosFallidos = 0;
+
+    @Column
+    protected LocalDateTime bloqueadoHasta;
+
 }
