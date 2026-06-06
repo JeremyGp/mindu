@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Crear Cuenta - MindU</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="style/style.css">
+</head>
+<body class="bg-zinc-50 font-['Inter'] min-h-screen flex flex-col justify-between antialiased text-zinc-900">
+
+<div class="pt-8"></div>
+
+<main class="w-full max-w-md mx-auto px-6 flex flex-col items-center">
+
+    <div class="flex flex-col items-center mb-6 text-center">
+        <div class="w-12 h-12 bg-black rounded-xl flex items-center justify-center mb-3 shadow-sm">
+            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+            </svg>
+        </div>
+        <h1 class="text-3xl font-bold tracking-tight text-black font-manrope">MindU</h1>
+        <p class="text-zinc-500 text-sm mt-1 font-medium">Portal de Salud Mental de Grado Clínico</p>
+    </div>
+
+    <!-- Alerta de error -->
+    <div id="alertaError" class="hidden w-full mb-4 px-4 py-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm font-medium"></div>
+    <!-- Alerta de éxito -->
+    <div id="alertaExito" class="hidden w-full mb-4 px-4 py-3 bg-green-50 border border-green-200 rounded-xl text-green-700 text-sm font-medium"></div>
+
+    <div class="w-full bg-white border border-zinc-200/80 rounded-2xl p-8 shadow-[0_4px_20px_rgba(0,0,0,0.03)]">
+
+        <form id="registerForm" onsubmit="procesarRegistro(event)" novalidate>
+
+            <!-- Nombre y Apellido -->
+            <div class="grid grid-cols-2 gap-3 mb-5">
+                <div>
+                    <label for="nombre" class="block text-xs font-bold uppercase tracking-wider text-zinc-700 mb-2">Nombre</label>
+                    <input type="text" id="nombre" placeholder="Ej. Sarah"
+                           class="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-black focus:border-black transition text-sm"/>
+                    <p class="campo-error text-red-500 text-xs mt-1 hidden"></p>
+                </div>
+                <div>
+                    <label for="apellido" class="block text-xs font-bold uppercase tracking-wider text-zinc-700 mb-2">Apellido</label>
+                    <input type="text" id="apellido" placeholder="Ej. Alarcón"
+                           class="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-black focus:border-black transition text-sm"/>
+                    <p class="campo-error text-red-500 text-xs mt-1 hidden"></p>
+                </div>
+            </div>
+
+            <!-- Correo -->
+            <div class="mb-5">
+                <label for="correo" class="block text-xs font-bold uppercase tracking-wider text-zinc-700 mb-2">Correo Electrónico</label>
+                <input type="email" id="correo" placeholder="nombre@universidad.edu.pe"
+                       class="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-black focus:border-black transition text-sm"/>
+                <p class="campo-error text-red-500 text-xs mt-1 hidden"></p>
+            </div>
+
+            <!-- Contraseña -->
+            <div class="mb-5">
+                <label for="password" class="block text-xs font-bold uppercase tracking-wider text-zinc-700 mb-2">Contraseña</label>
+                <input type="password" id="password" placeholder="Mínimo 6 caracteres"
+                       class="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-black focus:border-black transition text-sm"/>
+                <p class="campo-error text-red-500 text-xs mt-1 hidden"></p>
+            </div>
+
+            <!-- DNI y Código -->
+            <div class="grid grid-cols-2 gap-3 mb-5">
+                <div>
+                    <label for="dni" class="block text-xs font-bold uppercase tracking-wider text-zinc-700 mb-2">DNI</label>
+                    <input type="text" id="dni" placeholder="12345678" maxlength="8"
+                           class="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-black focus:border-black transition text-sm"/>
+                    <p class="campo-error text-red-500 text-xs mt-1 hidden"></p>
+                </div>
+                <div>
+                    <label for="codigo" class="block text-xs font-bold uppercase tracking-wider text-zinc-700 mb-2">Código</label>
+                    <input type="text" id="codigo" placeholder="U20231234"
+                           class="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-black focus:border-black transition text-sm"/>
+                    <p class="campo-error text-red-500 text-xs mt-1 hidden"></p>
+                </div>
+            </div>
+
+            <!-- Edad y Ciclo -->
+            <div class="grid grid-cols-2 gap-3 mb-6">
+                <div>
+                    <label for="edad" class="block text-xs font-bold uppercase tracking-wider text-zinc-700 mb-2">Edad</label>
+                    <input type="number" id="edad" placeholder="20" min="16" max="99"
+                           class="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-black focus:border-black transition text-sm"/>
+                    <p class="campo-error text-red-500 text-xs mt-1 hidden"></p>
+                </div>
+                <div>
+                    <label for="ciclo" class="block text-xs font-bold uppercase tracking-wider text-zinc-700 mb-2">Ciclo Académico</label>
+                    <select id="ciclo"
+                            class="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 focus:outline-none focus:ring-2 focus:ring-black focus:border-black transition text-sm">
+                        <option value="">Seleccionar</option>
+                        <option value="1">1°</option>
+                        <option value="2">2°</option>
+                        <option value="3">3°</option>
+                        <option value="4">4°</option>
+                        <option value="5">5°</option>
+                        <option value="6">6°</option>
+                        <option value="7">7°</option>
+                        <option value="8">8°</option>
+                        <option value="9">9°</option>
+                        <option value="10">10°</option>
+                    </select>
+                    <p class="campo-error text-red-500 text-xs mt-1 hidden"></p>
+                </div>
+            </div>
+
+            <button type="submit" id="btnRegistrar"
+                    class="w-full py-3.5 bg-black text-white rounded-xl font-semibold text-sm hover:bg-zinc-900 active:scale-[0.98] transition-all duration-150 mb-4 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                Registrarse
+            </button>
+
+        </form>
+    </div>
+
+    <p class="text-zinc-500 text-sm mt-6 font-medium">
+        ¿Ya tienes una cuenta? <a href="login.html" class="text-black font-bold hover:underline">Iniciar Sesión</a>
+    </p>
+
+    <div class="flex gap-4 text-[10px] font-bold text-zinc-400 uppercase tracking-widest mt-6 mb-4">
+        <a href="#" class="hover:text-zinc-600 transition">Términos de Servicio</a>
+        <a href="#" class="hover:text-zinc-600 transition">Política de Privacidad</a>
+        <a href="#" class="hover:text-zinc-600 transition">Cumplimiento</a>
+    </div>
+</main>
+
+<footer class="w-full flex justify-end p-6 pointer-events-none">
+    <div class="flex items-center gap-2 border border-zinc-200 bg-white px-3 py-1.5 rounded-full text-[11px] font-medium text-zinc-500 shadow-sm">
+        <svg class="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+        </svg>
+        Cifrado cumple con HIPAA
+    </div>
+</footer>
+
+<script>
+    const BACKEND = 'http://localhost:8080';
+
+    function mostrarError(inputId, mensaje) {
+        const input = document.getElementById(inputId);
+        const errorEl = input.parentElement.querySelector('.campo-error');
+        input.classList.add('border-red-400', 'focus:ring-red-400', 'focus:border-red-400');
+        input.classList.remove('border-zinc-200');
+        if (errorEl) { errorEl.textContent = mensaje; errorEl.classList.remove('hidden'); }
+    }
+
+    function limpiarErrores() {
+        document.querySelectorAll('.campo-error').forEach(el => { el.textContent = ''; el.classList.add('hidden'); });
+        document.querySelectorAll('input, select').forEach(el => {
+            el.classList.remove('border-red-400', 'focus:ring-red-400', 'focus:border-red-400');
+            el.classList.add('border-zinc-200');
+        });
+        document.getElementById('alertaError').classList.add('hidden');
+        document.getElementById('alertaExito').classList.add('hidden');
+    }
+
+    function validarFormulario(datos) {
+        let valido = true;
+        if (!datos.nombre.trim()) { mostrarError('nombre', 'El nombre es obligatorio'); valido = false; }
+        if (!datos.apellido.trim()) { mostrarError('apellido', 'El apellido es obligatorio'); valido = false; }
+        if (!datos.correo.trim()) { mostrarError('correo', 'El correo es obligatorio'); valido = false; }
+        else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(datos.correo)) { mostrarError('correo', 'El correo no tiene un formato válido'); valido = false; }
+        if (!datos.password) { mostrarError('password', 'La contraseña es obligatoria'); valido = false; }
+        else if (datos.password.length < 6) { mostrarError('password', 'La contraseña debe tener al menos 6 caracteres'); valido = false; }
+        if (!datos.dni.trim()) { mostrarError('dni', 'El DNI es obligatorio'); valido = false; }
+        else if (!/^\d{8}$/.test(datos.dni)) { mostrarError('dni', 'El DNI debe tener exactamente 8 dígitos'); valido = false; }
+        if (!datos.codigo.trim()) { mostrarError('codigo', 'El código universitario es obligatorio'); valido = false; }
+        if (!datos.edad) { mostrarError('edad', 'La edad es obligatoria'); valido = false; }
+        else if (datos.edad < 16) { mostrarError('edad', 'La edad mínima es 16 años'); valido = false; }
+        if (!datos.cicloAcademico) { mostrarError('ciclo', 'Selecciona un ciclo académico'); valido = false; }
+        return valido;
+    }
+
+    async function procesarRegistro(event) {
+        event.preventDefault();
+        limpiarErrores();
+
+        const datos = {
+            nombre: document.getElementById('nombre').value,
+            apellido: document.getElementById('apellido').value,
+            correo: document.getElementById('correo').value,
+            password: document.getElementById('password').value,
+            dni: document.getElementById('dni').value,
+            codigo: document.getElementById('codigo').value,
+            edad: parseInt(document.getElementById('edad').value) || null,
+            cicloAcademico: parseInt(document.getElementById('ciclo').value) || null
+        };
+
+        if (!validarFormulario(datos)) return;
+
+        const btn = document.getElementById('btnRegistrar');
+        btn.disabled = true;
+        btn.textContent = 'Registrando...';
+
+        try {
+            const res = await fetch(`${BACKEND}/api/auth/registro`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(datos)
+            });
+
+            const body = await res.json();
+
+            if (res.ok) {
+                const alerta = document.getElementById('alertaExito');
+                alerta.textContent = '¡Cuenta creada exitosamente! Redirigiendo al inicio de sesión...';
+                alerta.classList.remove('hidden');
+                setTimeout(() => window.location.href = 'login.html', 2000);
+            } else {
+                const alerta = document.getElementById('alertaError');
+                alerta.textContent = body.error || 'Ocurrió un error al registrar la cuenta';
+                alerta.classList.remove('hidden');
+            }
+        } catch (err) {
+            const alerta = document.getElementById('alertaError');
+            alerta.textContent = 'No se pudo conectar con el servidor. Verifica que el backend esté activo.';
+            alerta.classList.remove('hidden');
+        } finally {
+            btn.disabled = false;
+            btn.textContent = 'Registrarse';
+        }
+    }
+</script>
+
+</body>
+</html>
