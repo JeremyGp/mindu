@@ -255,6 +255,26 @@
 </div>
 
 <script>
+    const BACKEND = 'http://localhost:8080';
+    const token = sessionStorage.getItem('token');
+    if (!token) window.location.href = 'login.html';
+
+    // --- CARGAR PSICÓLOGOS DESDE EL BACKEND ---
+    let basePsicologos = [];
+
+    async function cargarPsicologos() {
+        try {
+            const res = await fetch(`${BACKEND}/api/psicologos`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (res.status === 401) { window.location.href = 'login.html'; return; }
+            basePsicologos = await res.json();
+        } catch (err) {
+            console.error('Error al cargar psicólogos:', err);
+        }
+    }
+    cargarPsicologos();
+
     // --- CONFIGURAR BLOQUEO DE CALENDARIO Y RENDERIZAR HISTORIAL DE SESIÓN ---
     document.addEventListener('DOMContentLoaded', () => {
         const inputFecha = document.getElementById('input-fecha');
@@ -267,7 +287,7 @@
         // RENDERIZAR CITAS DE LA SESIÓN ACTUAL AL RECARGAR O VOLVER A LA PESTAÑA
         const lista = document.getElementById('lista-citas');
         const historialCitas = JSON.parse(sessionStorage.getItem('alertasCitas')) || [];
-        
+
         // Se recorren en orden para mantener la estructura visual correcta
         historialCitas.forEach(cita => {
             const nuevaCitaNode = document.createElement('div');
@@ -276,66 +296,6 @@
             lista.appendChild(nuevaCitaNode);
         });
     });
-
-    // --- BANCO DE DATOS DE 8 PSICÓLOGOS ---
-    const basePsicologos = [
-        {
-            nombre: "Dra. Elena Rodríguez",
-            especialidad: "Especialista TCC • Ansiedad Universitaria",
-            modalidad: "virtual",
-            texto: "Seleccionamos a la Dra. Elena basándonos en tu último triaje (bucle de ansiedad alta). Su enfoque estructurado te ayudará a mitigar el estrés académico actual.",
-            foto: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=250&q=80"
-        },
-        {
-            nombre: "Dr. Marcos Venegas",
-            especialidad: "Terapeuta Clínico • Manejo del Estrés Crónico",
-            modalidad: "presencial",
-            texto: "El Dr. Marcos posee alta compatibilidad debido a los picos de sobrecarga reportados en tu historial de hábitos. Recomendamos encarecidamente la asistencia presencial.",
-            foto: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=250&q=80"
-        },
-        {
-            nombre: "Dra. Sofía Alva",
-            especialidad: "Psicóloga Clínica • Trastornos del Sueño",
-            modalidad: "virtual",
-            texto: "Asignada automáticamente debido a tu métrica de insomnio reciente (menos de 6 horas acumuladas). Abordarán técnicas efectivas de higiene de sueño.",
-            foto: "https://images.unsplash.com/photo-1582562124811-c09040d0a901?auto=format&fit=crop&w=250&q=80"
-        },
-        {
-            nombre: "Dr. Ricardo Méndez",
-            especialidad: "Neuropsicólogo • Gestión del Enfoque y TDAH",
-            modalidad: "presencial",
-            texto: "Recomendado por la IA para optimizar tus periodos de concentración y estructurar tus rutinas diarias de estudio. Su consulta presencial cuenta con herramientas físicas de apoyo.",
-            foto: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80"
-        },
-        {
-            nombre: "Dra. Camila Ortega",
-            especialidad: "Psicoterapeuta • Regulación Emocional y Autoestima",
-            modalidad: "virtual",
-            texto: "Seleccionada por compatibilidad directa con tu perfil de bienestar emocional. Su espacio virtual te ofrecerá un entorno seguro para conversar calmadamente.",
-            foto: "https://images.unsplash.com/photo-1567532939604-b6b5b0db2604?auto=format&fit=crop&w=250&q=80"
-        },
-        {
-            nombre: "Dr. Julián Castro",
-            especialidad: "Especialista en Prevención de Burnout y Desgaste",
-            modalidad: "virtual",
-            texto: "La IA detectó una sobrecarga en las entregas y tareas pendientes de esta semana. El Dr. Julián te brindará herramientas clave de contención.",
-            foto: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=250&q=80"
-        },
-        {
-            nombre: "Dra. Valeria Mendiola",
-            especialidad: "Terapeuta Cognitiva • Gestión del Rendimiento",
-            modalidad: "presencial",
-            texto: "La Dra. Valeria trabaja esquemas orientados al cumplimiento de metas sin comprometer la salud mental. Ideal para afrontar periodos de alta exigencia.",
-            foto: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=250&q=80"
-        },
-        {
-            nombre: "Dr. Alberto Torres",
-            especialidad: "Psicólogo Clínico • Intervención en Crisis",
-            modalidad: "virtual",
-            texto: "Asignado como soporte inmediato tras evaluar desajustes emocionales agudos. Posee amplia trayectoria institucional en manejo de contingencias.",
-            foto: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&w=250&q=80"
-        }
-    ];
 
     const psicologoPorDefecto = {
         nombre: "Dr. Carlos Martinez",
@@ -397,23 +357,23 @@
     // --- LÓGICA DE RECOMENDACIÓN ALEATORIA DE IA ---
     document.getElementById('btn-ia-auto').addEventListener('click', () => {
         const loading = document.getElementById('ai-loading');
-        loading.classList.remove('hidden'); 
-        
+        loading.classList.remove('hidden');
+
         setTimeout(() => {
-            loading.classList.add('hidden'); 
-            
+            loading.classList.add('hidden');
+
             const psicologoElegido = basePsicologos[Math.floor(Math.random() * basePsicologos.length)];
-            
+
             const hoy = new Date();
-            hoy.setDate(hoy.getDate() + Math.floor(Math.random() * 4) + 1); 
+            hoy.setDate(hoy.getDate() + Math.floor(Math.random() * 4) + 1);
             const fechaString = hoy.toISOString().split('T')[0];
             const horasDisponibles = ["09:00", "11:30", "15:00", "17:30"];
             const horaString = horasDisponibles[Math.floor(Math.random() * horasDisponibles.length)];
 
             document.getElementById('input-fecha').value = fechaString;
             document.getElementById('input-hora').value = horaString;
-            
-            if(psicologoElegido.modalidad === 'virtual') {
+
+            if (psicologoElegido.modalidad === 'virtual') {
                 radioVirtual.checked = true;
             } else {
                 radioPresencial.checked = true;
@@ -428,13 +388,13 @@
             labelVirtual.classList.add('pointer-events-none', 'opacity-70');
             labelPresencial.classList.add('pointer-events-none', 'opacity-70');
 
-            document.getElementById('nombre-psicologo').innerText = psicologoElegido.nombre;
+            document.getElementById('nombre-psicologo').innerText = `${psicologoElegido.nombre} ${psicologoElegido.apellido}`;
             document.getElementById('especialidad-psicologo').innerText = psicologoElegido.especialidad;
             document.getElementById('dispo-psicologo').innerText = `${fechaString} a las ${horaString} hrs`;
-            document.getElementById('foto-psicologo').src = psicologoElegido.foto;
-            
+            document.getElementById('foto-psicologo').src = 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=250&q=80';
+
             document.getElementById('reco-titulo').innerText = "RECOMENDACIÓN OPTIMIZADA POR IA ✨";
-            document.getElementById('reco-texto').innerText = psicologoElegido.texto;
+            document.getElementById('reco-texto').innerText = `Seleccionamos a ${psicologoElegido.nombre} ${psicologoElegido.apellido} por su especialidad en ${psicologoElegido.especialidad}.`;
 
             document.getElementById('ai-badge').classList.remove('hidden');
         }, 1000);
@@ -448,7 +408,7 @@
     // --- ENVIAR FORMULARIO Y GUARDAR EN SESSIONSTORAGE ---
     document.getElementById('form-cita').addEventListener('submit', (e) => {
         e.preventDefault();
-        
+
         const inputFecha = document.getElementById('input-fecha');
         const inputHora = document.getElementById('input-hora');
 
@@ -477,7 +437,6 @@
             tiempo: "Hace un momento"
         };
 
-        // CAMBIADO A QUÍ TAMBIÉN: Ahora acumula temporalmente en sessionStorage
         let historialCitas = JSON.parse(sessionStorage.getItem('alertasCitas')) || [];
         historialCitas.unshift(nuevaNotificacionCita);
         sessionStorage.setItem('alertasCitas', JSON.stringify(historialCitas));
@@ -500,7 +459,7 @@
 
         // Alternar la visibilidad del menú al hacer clic en el avatar
         botonPerfil.addEventListener('click', (e) => {
-            e.stopPropagation(); // Evita que el evento cierre el menú inmediatamente
+            e.stopPropagation();
             menuDesplegable.classList.toggle('hidden');
         });
 
@@ -511,12 +470,10 @@
             }
         });
 
-        // Evento para simular el cierre de sesión y redirigir a login.html
+        // Evento para cerrar sesión
         botonCerrarSesion.addEventListener('click', (e) => {
             e.preventDefault();
-            
-            // Aquí en un futuro tus compañeros añadirán la lógica para limpiar tokens o sesiones reales.
-            // Por ahora, redirige perfectamente al Login
+            sessionStorage.clear();
             window.location.href = 'login.html';
         });
     });
