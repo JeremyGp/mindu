@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Notificaciones - MindU</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght=400;500;600;700&family=Inter:wght=400;500;600&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+
+    <link rel="stylesheet" href="../static/style/style.css">
+</head>
+
+<body class="font-body-lg text-on-surface bg-background">
+
+    <header class="flex fixed top-0 left-0 right-0 z-50 justify-between items-center px-8 h-16 bg-white border-b border-zinc-200 font-manrope antialiased tracking-tight">
+        <div class="flex items-center gap-stack-md">
+            <span class="text-xl font-extrabold tracking-tighter text-black">MindU</span>
+        </div>
+        <div class="flex items-center gap-6">
+            <div class="flex items-center gap-4">
+                <button class="relative p-2 text-zinc-600 hover:bg-zinc-100 rounded-full transition-colors">
+                    <span class="material-symbols-outlined">notifications</span>
+                    <span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
+                </button>
+                
+                <div class="relative">
+                    <button id="botonPerfil" class="flex items-center focus:outline-none transition-transform active:scale-95">
+                        <div class="h-8 w-8 rounded-full overflow-hidden border border-zinc-200">
+                            <img alt="User profile avatar" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDJu_JVp6Rt2Fd_tSC5SUhGthyIX3cbdTT_3yqUYeuNYt2IEpeUpYwp0gvcU2YbpqWs4nMZute87EXaF2sPngS9M0RNiXt-kdVdqB2wzG3hN5w9mAlRAf0l92AS3qtqJs9V0lRbMvhAk5ewBv3ao0cs5FJ3nS9j-r9KuDTR994SEUfjLHH6syufi-Eowph4RWyOe5VNGKAlMxZNG0VEF1JMZqZJXEOupr3Ku4DW_BNfCW0m1waLfIUfr22vGVSA9nWedP7Q_KO7hgI"/>
+                        </div>
+                    </button>
+
+                    <div id="menuDesplegable" class="hidden absolute right-0 mt-2 w-48 bg-white border border-zinc-200 rounded-lg shadow-lg py-1 z-50 animate-fade-in">
+                        <a href="ajustes.html" class="flex items-center px-4 py-2.5 text-sm text-zinc-700 hover:bg-zinc-50 transition-colors">
+                            <span class="material-symbols-outlined mr-2 text-[18px] text-zinc-500">account_circle</span>
+                            Ver perfil
+                        </a>
+                        <hr class="border-zinc-100 my-1">
+                        <button id="botonCerrarSesion" class="w-full flex items-center px-4 py-2.5 text-sm text-error hover:bg-red-50 transition-colors text-left">
+                            <span class="material-symbols-outlined mr-2 text-[18px] text-error">logout</span>
+                            Cerrar sesión
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex pt-16">
+        <aside class="h-[calc(100vh-64px)] w-64 fixed left-0 top-16 flex flex-col bg-surface border-r border-surface-container py-stack-md z-40">
+            <nav class="flex-grow flex flex-col">
+                <a class="flex items-center px-margin py-3 text-secondary hover:bg-surface-container-high transition-all active:scale-95 duration-200" href="panelPrincipal.html">
+                    <span class="material-symbols-outlined mr-3">dashboard</span>
+                    <span class="font-label-caps text-label-caps">Panel Principal</span>
+                </a>
+                
+                <a class="flex items-center px-margin py-3 text-secondary hover:bg-surface-container-high transition-all active:scale-95 duration-200" href="citas.html">
+                    <span class="material-symbols-outlined mr-3">calendar_month</span>
+                    <span class="font-label-caps text-label-caps">Citas</span>
+                </a>
+
+                <a class="flex items-center px-margin py-3 text-secondary hover:bg-surface-container-high transition-all active:scale-95 duration-200" href="triaje.html">
+                    <span class="material-symbols-outlined mr-3">psychology</span>
+                    <span class="font-label-caps text-label-caps">Triaje IA</span>
+                </a>
+
+                <a class="flex items-center px-margin py-3 text-secondary hover:bg-surface-container-high transition-all active:scale-95 duration-200" href="tareas.html">
+                    <span class="material-symbols-outlined mr-3">assignment</span>
+                    <span class="font-label-caps text-label-caps">Tareas TCC</span>
+                </a>
+
+                <a class="flex items-center px-margin py-3 text-secondary hover:bg-surface-container-high transition-all active:scale-95 duration-200" href="habitos.html">
+                    <span class="material-symbols-outlined mr-3">event_note</span>
+                    <span class="font-label-caps text-label-caps">Seguimiento de Hábitos</span>
+                </a>
+
+                <a class="flex items-center px-margin py-3 text-secondary hover:bg-surface-container-high transition-all active:scale-95 duration-200 active-tab" href="notificaciones.html">
+                    <span class="material-symbols-outlined mr-3">notifications</span>
+                    <span class="font-label-caps text-label-caps">Notificaciones</span>
+                </a>
+
+                <a class="flex items-center px-margin py-3 text-secondary hover:bg-surface-container-high transition-all active:scale-95 duration-200" href="configuracion.html">
+                    <span class="material-symbols-outlined mr-3">settings</span>
+                    <span class="font-label-caps text-label-caps">Configuración</span>
+                </a>
+            </nav>
+            
+            <div class="px-margin mt-auto pt-stack-md space-y-2">
+                <button class="w-full bg-error text-on-error font-button-text text-button-text py-3 rounded uppercase tracking-wider hover:opacity-90 transition-opacity">
+                    SOS Emergency
+                </button>
+                <div class="pt-4 border-t border-surface-container"></div>
+            </div>
+        </aside>
+
+        <main class="flex-grow ml-64 p-margin min-h-screen">
+            <div class="max-w-[1000px] mx-auto">
+
+                <div class="mb-6 font-manrope">
+                    <h2 class="text-3xl font-bold tracking-tight text-zinc-900 mb-6">Notificaciones</h2>
+                    
+                    <div class="flex gap-2 mb-8">
+                        <button class="px-4 py-1.5 bg-black text-white rounded-full text-sm font-medium transition-colors">Todos</button>
+                        <button class="px-4 py-1.5 bg-zinc-100 text-zinc-600 hover:bg-zinc-200 rounded-full text-sm font-medium transition-colors">Mensajes</button>
+                        <button class="px-4 py-1.5 bg-zinc-100 text-zinc-600 hover:bg-zinc-200 rounded-full text-sm font-medium transition-colors">Recordatorios</button>
+                    </div>
+                </div>
+
+                <div id="contenedor-notificaciones" class="space-y-4 font-inter">
+                    
+                    <div class="flex items-center justify-between p-5 bg-white border border-zinc-200 rounded-xl hover:shadow-sm transition-shadow">
+                        <div class="flex items-start gap-4">
+                            <div class="relative flex-shrink-0">
+                                <span class="absolute top-1 -left-2 w-2 h-2 bg-red-500 rounded-full"></span>
+                                <div class="w-11 h-11 rounded-full overflow-hidden border border-zinc-100 bg-zinc-100">
+                                    <img alt="Doctora Carla Ruiz" class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=120" />
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-2 mb-1">
+                                    <h4 class="text-sm font-bold text-zinc-900">Dra. Carla Ruiz</h4>
+                                    <span class="text-xs text-zinc-400">• Hace 2 horas</span>
+                                </div>
+                                <p class="text-sm text-zinc-600">Hola, he revisado tus registros de la semana. Noté una mejora en...</p>
+                            </div>
+                        </div>
+                        <button class="px-5 py-2 border border-zinc-200 hover:bg-zinc-50 text-zinc-700 text-sm font-semibold rounded-lg transition-colors">Abrir</button>
+                    </div>
+
+                    <div class="flex items-center justify-between p-5 bg-white border border-zinc-200 rounded-xl hover:shadow-sm transition-shadow">
+                        <div class="flex items-start gap-4">
+                            <div class="w-11 h-11 rounded-full bg-zinc-50 border border-zinc-200 flex items-center justify-center text-zinc-500 flex-shrink-0">
+                                <span class="material-symbols-outlined text-[22px]">assignment</span>
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-2 mb-1">
+                                    <h4 class="text-sm font-bold text-zinc-900">Sistema</h4>
+                                    <span class="text-xs text-zinc-400">• Hace 5 horas</span>
+                                </div>
+                                <p class="text-sm text-zinc-600">Recuerda completar tu registro de Terapia Cognitivo Conductual (TCC) de hoy.</p>
+                            </div>
+                        </div>
+                        <button class="px-5 py-2 border border-zinc-200 hover:bg-zinc-50 text-zinc-700 text-sm font-semibold rounded-lg transition-colors">Abrir</button>
+                    </div>
+
+                    <div class="flex items-center justify-between p-5 bg-white border border-zinc-200 rounded-xl hover:shadow-sm transition-shadow">
+                        <div class="flex items-start gap-4">
+                            <div class="w-11 h-11 rounded-full bg-zinc-50 border border-zinc-200 flex items-center justify-center text-zinc-500 flex-shrink-0">
+                                <span class="material-symbols-outlined text-[22px]">self_improvement</span>
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-2 mb-1">
+                                    <h4 class="text-sm font-bold text-zinc-900">Seguimiento de Hábitos</h4>
+                                    <span class="text-xs text-zinc-400">• Ayer</span>
+                                </div>
+                                <p class="text-sm text-zinc-600">Es tu hora programada para la sesión de meditación guiada de 10 minutos.</p>
+                            </div>
+                        </div>
+                        <button class="px-5 py-2 border border-zinc-200 hover:bg-zinc-50 text-zinc-700 text-sm font-semibold rounded-lg transition-colors">Abrir</button>
+                    </div>
+
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- MENÚ DESPLEGABLE DE PERFIL ---
+            const botonPerfil = document.getElementById('botonPerfil');
+            const menuDesplegable = document.getElementById('menuDesplegable');
+            const botonCerrarSesion = document.getElementById('botonCerrarSesion');
+            const contenedorNotificaciones = document.getElementById('contenedor-notificaciones');
+
+            botonPerfil.addEventListener('click', (e) => {
+                e.stopPropagation();
+                menuDesplegable.classList.toggle('hidden');
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!menuDesplegable.classList.contains('hidden')) {
+                    menuDesplegable.classList.add('hidden');
+                }
+            });
+
+            botonCerrarSesion.addEventListener('click', (e) => {
+                e.preventDefault();
+                window.location.href = 'login.html';
+            });
+
+            // --- RENDERIZADO DE TODAS LAS CITAS ACUMULADAS EN ESTA SESIÓN ---
+            const listaCitas = JSON.parse(sessionStorage.getItem('alertasCitas')) || [];
+
+            // Se recorren al revés (.reverse) para que la más nueva quede siempre arriba al insertar
+            listaCitas.reverse().forEach(cita => {
+                const tarjetaCita = document.createElement('div');
+                tarjetaCita.className = "p-5 bg-white border border-zinc-200 rounded-xl hover:shadow-sm transition-shadow";
+                
+                tarjetaCita.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-start gap-4">
+                            <div class="relative flex-shrink-0">
+                                <span class="absolute top-1 -left-2 w-2 h-2 bg-blue-500 rounded-full"></span>
+                                <div class="w-11 h-11 rounded-full bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600">
+                                    <span class="material-symbols-outlined text-[24px]">calendar_month</span>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-2 mb-1">
+                                    <h4 class="text-sm font-bold text-zinc-900">Cita Confirmada Exitosamente</h4>
+                                    <span class="text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">Nuevo</span>
+                                    <span class="text-xs text-zinc-400">• ${cita.tiempo}</span>
+                                </div>
+                                <p class="text-sm text-zinc-600">Se ha agendado una nueva sesión médica de soporte de manera correcta.</p>
+                                
+                                <div id="detalles-${cita.id}" class="hidden mt-3 pt-3 border-t border-dashed border-zinc-200 text-xs text-zinc-700 space-y-1 bg-zinc-50 p-3 rounded-lg">
+                                    <p><strong>Especialista:</strong> ${cita.profesional}</p>
+                                    <p><strong>Fecha:</strong> ${cita.fecha}</p>
+                                    <p><strong>Hora:</strong> ${cita.hora} hrs</p>
+                                    <p><strong>Modalidad:</strong> ${cita.modalidad}</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button data-id="${cita.id}" class="btn-desplegar flex items-center gap-1 px-4 py-2 border border-zinc-200 hover:bg-zinc-50 text-zinc-700 text-sm font-semibold rounded-lg transition-colors">
+                            <span>Ver más</span>
+                            <span class="material-symbols-outlined text-[18px] transition-transform duration-200 icon-flecha">keyboard_arrow_down</span>
+                        </button>
+                    </div>
+                `;
+
+                // Las acumulamos arriba de las notificaciones estáticas
+                contenedorNotificaciones.insertBefore(tarjetaCita, contenedorNotificaciones.firstChild);
+            });
+
+            // --- MANEJO DEL EVENTO DESPLEGABLE (VER MÁS / VER MENOS) ---
+            // CORREGIDO: Delegación de eventos para asegurar que escuche los elementos creados dinámicamente
+            contenedorNotificaciones.addEventListener('click', (e) => {
+                const boton = e.target.closest('.btn-desplegar');
+                if (!boton) return;
+
+                const idCita = boton.getAttribute('data-id');
+                const panelDetalles = document.getElementById(`detalles-${idCita}`);
+                const iconoFlecha = boton.querySelector('.icon-flecha');
+                const textoBoton = boton.querySelector('span:not(.material-symbols-outlined)');
+
+                if (panelDetalles.classList.contains('hidden')) {
+                    panelDetalles.classList.remove('hidden');
+                    textoBoton.textContent = 'Ver menos';
+                    iconoFlecha.style.transform = 'rotate(180deg)';
+                } else {
+                    panelDetalles.classList.add('hidden');
+                    textoBoton.textContent = 'Ver más';
+                    iconoFlecha.style.transform = 'rotate(0deg)';
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>
