@@ -2,6 +2,8 @@ package grupo.diseno.mindu.service;
 
 import grupo.diseno.mindu.dto.AgendarCitaRequest;
 import grupo.diseno.mindu.dto.CitaResponseDTO;
+import grupo.diseno.mindu.dto.RecomendacionCitaDTO;
+import grupo.diseno.mindu.integration.AIService;
 import grupo.diseno.mindu.model.*;
 import grupo.diseno.mindu.repository.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,6 +40,9 @@ class CitaServiceTest {
 
     @Mock
     private DisponibilidadRepository disponibilidadRepository;
+
+    @Mock
+    private AIService aiService;
 
     @InjectMocks
     private CitaService citaService;
@@ -192,6 +197,17 @@ class CitaServiceTest {
                 eq(psicologo.getId()), any(LocalDate.class))).thenReturn(List.of(disponibilidad));
         when(citaRepository.existsOverlappingPsicologo(eq(psicologo.getId()), eq(disponibilidad.getFecha()), eq(disponibilidad.getHora()), eq(EstadoCita.CANCELADA))).thenReturn(false);
         when(citaRepository.existsOverlappingEstudiante(eq(estudiante.getId()), eq(disponibilidad.getFecha()), eq(disponibilidad.getHora()), eq(EstadoCita.CANCELADA))).thenReturn(false);
+
+        RecomendacionCitaDTO rec = RecomendacionCitaDTO.builder()
+                .psicologoId(psicologo.getId())
+                .psicologoNombreCompleto(psicologo.getNombre() + " " + psicologo.getApellido())
+                .psicologoEspecialidad(psicologo.getEspecialidad())
+                .modalidad(psicologo.getModalidad())
+                .fecha(disponibilidad.getFecha())
+                .hora(disponibilidad.getHora())
+                .prioridad(1)
+                .build();
+        when(aiService.recomendarCitas(eq(estudiante), anyList())).thenReturn(List.of(rec));
 
         // Act
         var result = citaService.generarRecomendacionesIA(estudiante.getCorreo());

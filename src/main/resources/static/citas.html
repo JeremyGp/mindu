@@ -318,6 +318,10 @@
         try {
             const res = await fetch(`${BACKEND}/api/psicologos`, { headers: authHeaders() });
             if (manejarUnauthorized(res)) return;
+            if (!res.ok) {
+                const text = await res.text();
+                throw new Error(`Servidor respondió con ${res.status}: ${text}`);
+            }
             const data = await res.json();
             basePsicologos = Array.isArray(data) ? data : (data.psicologos || []);
 
@@ -337,6 +341,7 @@
             });
         } catch (err) {
             console.error('Error al cargar psicólogos:', err);
+            mostrarToast('Error al cargar la lista de psicólogos: ' + err.message, 'error');
         }
     }
 
@@ -427,39 +432,45 @@
 
     // ── CARGAR MIS CITAS ──────────────────────────────────────────────────────
     async function cargarMisCitas() {
-    try {
-        const res = await fetch(`${BACKEND}/api/citas/mis-citas`, { headers: authHeaders() });
-        if (manejarUnauthorized(res)) return;
-        const data = await res.json();
-        const citas = Array.isArray(data) ? data : (data.citas || []);
+        try {
+            const res = await fetch(`${BACKEND}/api/citas/mis-citas`, { headers: authHeaders() });
+            if (manejarUnauthorized(res)) return;
+            if (!res.ok) {
+                const text = await res.text();
+                throw new Error(`Servidor respondió con ${res.status}: ${text}`);
+            }
+            const data = await res.json();
+            const citas = Array.isArray(data) ? data : (data.citas || []);
 
-        const lista = document.getElementById('lista-citas');
-        lista.innerHTML = '';
+            const lista = document.getElementById('lista-citas');
+            lista.innerHTML = '';
 
-        if (citas.length === 0) {
-            const vacio = document.createElement('p');
-            vacio.className = 'text-secondary text-body-sm pt-2';
-            vacio.textContent = 'No tienes citas programadas aún.';
-            lista.appendChild(vacio);
-            return;
+            if (citas.length === 0) {
+                const vacio = document.createElement('p');
+                vacio.className = 'text-secondary text-body-sm pt-2';
+                vacio.textContent = 'No tienes citas programadas aún.';
+                lista.appendChild(vacio);
+                return;
+            }
+
+            citas.forEach(cita => {
+                const node = document.createElement('div');
+                node.className = 'bg-white px-4 py-2 rounded-full border border-primary flex items-center gap-2 animate-fade-in cursor-pointer hover:bg-primary/5 transition-all';
+                node.innerHTML = `
+                    <span class="w-2 h-2 rounded-full bg-primary"></span>
+                    <span class="text-body-sm text-primary font-bold">
+                        ${cita.fecha} ${cita.hora ? cita.hora.substring(0, 5) : ''} -
+                        ${cita.modalidad} (${cita.psicologoNombreCompleto || ''})
+                    </span>
+                `;
+                node.addEventListener('click', () => mostrarDetalleCita(cita));
+                lista.appendChild(node);
+            });
+        } catch (err) {
+            console.error('Error al cargar mis citas:', err);
+            mostrarToast('Error al cargar tus citas: ' + err.message, 'error');
         }
-
-        citas.forEach(cita => {
-            const node = document.createElement('div');
-            node.className = 'bg-white px-4 py-2 rounded-full border border-primary flex items-center gap-2 animate-fade-in';
-            node.innerHTML = `
-                <span class="w-2 h-2 rounded-full bg-primary"></span>
-                <span class="text-body-sm text-primary font-bold">
-                    ${cita.fecha} ${cita.hora ? cita.hora.substring(0, 5) : ''} -
-                    ${cita.modalidad} (${cita.psicologoNombreCompleto || ''})
-                </span>
-            `;
-            lista.appendChild(node);
-        });
-    } catch (err) {
-        console.error('Error al cargar mis citas:', err);
     }
-}
 
     // ── CARD PSICÓLOGO (defaults) ─────────────────────────────────────────────
     function resetearCardPsicologo() {
@@ -827,6 +838,92 @@
         iconEl.textContent = icon;
         iconEl.classList.remove('text-zinc-400', 'animate-spin');
         iconEl.classList.add('text-green-600');
+    }
+
+    // ── EVENT LISTENERS Y CARGA INICIAL (MVP 1 FIXES) ──────────────────────
+    document.getElementById('select-psicologo').addEventListener('change', (e) => {
+        const val = e.target.value;
+        if (val) {
+            cargarSlots(val);
+        } else {
+            resetearFormulario();
+        }
+    });
+
+    document.getElementById('btn-confirmar-desde-modal').addEventListener('click', async () => {
+        if (recomendacionSeleccionada) {
+            const reco = recomendacionSeleccionada;
+            await aplicarRecomendacionIA(reco);
+            document.getElementById('modal-preconf-ia').classList.add('hidden');
+            const form = document.getElementById('form-cita');
+            if (typeof form.requestSubmit === 'function') {
+                form.requestSubmit();
+            } else {
+                form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+            }
+        }
+    });
+
+    function mostrarDetalleCita(cita) {
+        document.getElementById('detalle-cita-id').textContent = cita.id;
+        document.getElementById('detalle-cita-estado').textContent = cita.estado || 'CONFIRMADA';
+        document.getElementById('detalle-cita-fecha').textContent = cita.fecha;
+        document.getElementById('detalle-cita-hora').textContent = cita.hora ? cita.hora.substring(0, 5) : '';
+        document.getElementById('detalle-cita-modalidad').textContent = cita.modalidad;
+        document.getElementById('detalle-cita-psicologo').textContent = cita.psicologoNombreCompleto || '';
+        document.getElementById('detalle-cita-especialidad').textContent = cita.psicologoEspecialidad || 'Especialista';
+        document.getElementById('detalle-cita-paciente').textContent = cita.estudianteNombreCompleto || sessionStorage.getItem('nombreUsuario') || 'Paciente';
+
+        const cancelBtn = document.getElementById('btn-cancelar-cita-modal');
+        if (cita.estado === 'PENDIENTE' || cita.estado === 'CONFIRMADA') {
+            cancelBtn.classList.remove('hidden');
+            cancelBtn.onclick = async () => {
+                if (confirm('¿Estás seguro de que deseas cancelar esta cita?')) {
+                    try {
+                        const res = await fetch(`${BACKEND}/api/citas/${cita.id}/estado`, {
+                            method: 'PUT',
+                            headers: authHeaders(),
+                            body: JSON.stringify({ estado: 'CANCELADA' })
+                        });
+                        if (manejarUnauthorized(res)) return;
+                        if (res.ok) {
+                            mostrarToast('Cita cancelada con éxito.');
+                            cerrarModalDetalle();
+                            cargarMisCitas();
+                        } else {
+                            const data = await res.json();
+                            mostrarToast(data.error || 'Error al cancelar la cita.', 'error');
+                        }
+                    } catch (err) {
+                        console.error(err);
+                        mostrarToast('Error al conectar con el servidor.', 'error');
+                    }
+                }
+            };
+        } else {
+            cancelBtn.classList.add('hidden');
+        }
+
+        document.getElementById('modal-detalle-cita').classList.remove('hidden');
+    }
+
+    function cerrarModalDetalle() {
+        document.getElementById('modal-detalle-cita').classList.add('hidden');
+    }
+
+    document.getElementById('btn-cerrar-modal-detalle').addEventListener('click', cerrarModalDetalle);
+    document.getElementById('btn-cerrar-modal-detalle-action').addEventListener('click', cerrarModalDetalle);
+
+    // Cargar datos al iniciar
+    function inicializarCitas() {
+        cargarPsicologos();
+        cargarMisCitas();
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', inicializarCitas);
+    } else {
+        inicializarCitas();
     }
 </script>
 <!-- Lógica Interactiva en JavaScript -->
