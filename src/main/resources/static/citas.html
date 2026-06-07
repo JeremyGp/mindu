@@ -136,22 +136,28 @@
                     </h3>
 
                     <form id="form-cita" class="space-y-stack-md">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
-                            <div class="flex flex-col gap-2">
-                                <label class="font-label-caps text-label-caps text-primary">FECHA</label>
-                                <div class="relative">
-                                    <input id="input-fecha" class="w-full bg-surface-container-low border-none rounded-lg p-3 text-body-sm focus:ring-1 focus:ring-primary transition-all" required="" type="date"/>
-                                </div>
-                            </div>
-                            <div class="flex flex-col gap-2">
-                                <label class="font-label-caps text-label-caps text-primary">HORA</label>
-                                <div class="relative">
-                                    <input id="input-hora" class="w-full bg-surface-container-low border-none rounded-lg p-3 text-body-sm focus:ring-1 focus:ring-primary transition-all" required="" type="time"/>
-                                </div>
+
+                        <!-- PASO 1: Seleccionar Psicólogo -->
+                        <div class="flex flex-col gap-2">
+                            <label class="font-label-caps text-label-caps text-primary">PSICÓLOGO</label>
+                            <select id="select-psicologo" class="w-full bg-surface-container-low border-none rounded-lg p-3 text-body-sm focus:ring-1 focus:ring-primary transition-all" required>
+                                <option value="">-- Cargando psicólogos... --</option>
+                            </select>
+                        </div>
+
+                        <!-- PASO 2: Horarios disponibles del psicólogo -->
+                        <div class="flex flex-col gap-2">
+                            <label class="font-label-caps text-label-caps text-primary">HORARIO DISPONIBLE</label>
+                            <div id="slots-container" class="min-h-[48px]">
+                                <p class="text-secondary text-body-sm pt-2">Selecciona un psicólogo para ver sus horarios.</p>
                             </div>
                         </div>
 
-                        <div class="flex flex-col gap-4 pt-4">
+                        <!-- Campos ocultos que se rellenan al elegir slot o IA -->
+                        <input type="hidden" id="input-fecha"/>
+                        <input type="hidden" id="input-hora"/>
+
+                        <div class="flex flex-col gap-4 pt-2">
                             <label class="font-label-caps text-label-caps text-primary">MODALIDAD DE ATENCIÓN</label>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <label id="label-virtual" class="flex items-center p-4 bg-surface-container-low rounded-lg cursor-pointer border border-transparent hover:border-outline-variant transition-all">
@@ -259,53 +265,227 @@
     const token = sessionStorage.getItem('token');
     if (!token) window.location.href = 'login.html';
 
-    // --- CARGAR PSICÓLOGOS DESDE EL BACKEND ---
     let basePsicologos = [];
+    let psicologoSeleccionado = null;   // objeto PsicologoDTO
+    let slotSeleccionado = null;        // { fecha, hora } del slot elegido
 
+    function authHeaders() {
+        return { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' };
+    }
+    function manejarUnauthorized(res) {
+        if (res.status === 401) { window.location.href = 'login.html'; return true; }
+        return false;
+    }
+
+    // ── TOAST ────────────────────────────────────────────────────────────────
+    function mostrarToast(msg, tipo = 'success') {
+        let t = document.getElementById('toast-feedback');
+        if (!t) {
+            t = document.createElement('div');
+            t.id = 'toast-feedback';
+            t.className = 'fixed bottom-6 right-6 z-50 px-5 py-3 rounded-lg shadow-lg text-white text-sm font-manrope font-semibold transition-opacity duration-300 opacity-0';
+            document.body.appendChild(t);
+        }
+        t.textContent = msg;
+        t.classList.remove('bg-green-700', 'bg-red-700');
+        t.classList.add(tipo === 'success' ? 'bg-green-700' : 'bg-red-700');
+        t.classList.remove('opacity-0');
+        clearTimeout(t._timer);
+        t._timer = setTimeout(() => t.classList.add('opacity-0'), 3500);
+    }
+
+    // ── GUARDAR NOTIFICACIÓN EN SESSIONSTORAGE (para notificaciones.html) ────
+    function guardarNotificacion(cita) {
+        const notif = {
+            id: cita.id || Date.now(),
+            profesional: cita.psicologoNombreCompleto || '',
+            fecha: cita.fecha || '',
+            hora: cita.hora ? cita.hora.substring(0, 5) : '',
+            modalidad: cita.modalidad || '',
+            tiempo: 'Hace un momento'
+        };
+        let lista = JSON.parse(sessionStorage.getItem('alertasCitas')) || [];
+        lista.unshift(notif);
+        sessionStorage.setItem('alertasCitas', JSON.stringify(lista));
+    }
+
+    // ── CARGAR PSICÓLOGOS ────────────────────────────────────────────────────
     async function cargarPsicologos() {
         try {
-            const res = await fetch(`${BACKEND}/api/psicologos`, {
-                headers: { 'Authorization': `Bearer ${token}` }
+            const res = await fetch(`${BACKEND}/api/psicologos`, { headers: authHeaders() });
+            if (manejarUnauthorized(res)) return;
+            const data = await res.json();
+            basePsicologos = Array.isArray(data) ? data : (data.psicologos || []);
+
+            const sel = document.getElementById('select-psicologo');
+            sel.innerHTML = '<option value="">-- Selecciona un psicólogo --</option>';
+            basePsicologos.forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p.id;
+                opt.textContent = `${p.nombre} ${p.apellido} — ${p.especialidad} (${p.modalidad})`;
+                sel.appendChild(opt);
             });
-            if (res.status === 401) { window.location.href = 'login.html'; return; }
-            basePsicologos = await res.json();
         } catch (err) {
             console.error('Error al cargar psicólogos:', err);
         }
     }
-    cargarPsicologos();
 
-    // --- CONFIGURAR BLOQUEO DE CALENDARIO Y RENDERIZAR HISTORIAL DE SESIÓN ---
+    // ── CARGAR SLOTS DE UN PSICÓLOGO ─────────────────────────────────────────
+    async function cargarSlots(psicologoId) {
+        const container = document.getElementById('slots-container');
+        container.innerHTML = '<p class="text-secondary text-body-sm pt-2 animate-pulse">Cargando horarios disponibles...</p>';
+        slotSeleccionado = null;
+        document.getElementById('input-fecha').value = '';
+        document.getElementById('input-hora').value = '';
+
+        try {
+            const res = await fetch(`${BACKEND}/api/psicologos/${psicologoId}`, { headers: authHeaders() });
+            if (manejarUnauthorized(res)) return;
+            const detalle = await res.json();
+            const slots = detalle.horariosDisponibles || [];
+
+            // Actualizar card del psicólogo
+            psicologoSeleccionado = basePsicologos.find(p => p.id == psicologoId) || null;
+            if (psicologoSeleccionado) {
+                document.getElementById('nombre-psicologo').innerText = `${detalle.nombre} ${detalle.apellido}`;
+                document.getElementById('especialidad-psicologo').innerText = detalle.especialidad || '';
+                document.getElementById('dispo-psicologo').innerText = slots.length > 0
+                    ? `${slots[0].fecha} a las ${slots[0].hora.substring(0,5)}`
+                    : 'Sin disponibilidad próxima';
+                // Forzar modalidad según el psicólogo
+                const mod = (detalle.modalidad || '').toLowerCase();
+                if (mod === 'virtual') { document.getElementById('radio-virtual').checked = true; }
+                else if (mod === 'presencial') { document.getElementById('radio-presencial').checked = true; }
+                actualizarDisenoModalidad();
+            }
+
+            if (slots.length === 0) {
+                container.innerHTML = '<p class="text-secondary text-body-sm pt-2">Este psicólogo no tiene horarios disponibles por el momento.</p>';
+                return;
+            }
+
+            // Agrupar por fecha
+            const porFecha = {};
+            slots.forEach(s => {
+                if (!porFecha[s.fecha]) porFecha[s.fecha] = [];
+                porFecha[s.fecha].push(s);
+            });
+
+            container.innerHTML = '';
+            Object.entries(porFecha).forEach(([fecha, horas]) => {
+                const grupo = document.createElement('div');
+                grupo.className = 'mb-3';
+                const labelFecha = document.createElement('p');
+                labelFecha.className = 'text-[11px] font-bold text-secondary uppercase tracking-wider mb-2';
+                labelFecha.textContent = new Date(fecha + 'T00:00:00').toLocaleDateString('es-PE', { weekday: 'long', day: 'numeric', month: 'long' });
+                grupo.appendChild(labelFecha);
+
+                const botones = document.createElement('div');
+                botones.className = 'flex flex-wrap gap-2';
+                horas.forEach(slot => {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'slot-btn px-3 py-1.5 text-body-sm border border-outline-variant rounded-lg hover:border-primary hover:bg-primary/5 transition-all font-manrope font-semibold';
+                    btn.textContent = slot.hora.substring(0, 5);
+                    btn.dataset.fecha = slot.fecha;
+                    btn.dataset.hora = slot.hora;
+                    btn.addEventListener('click', () => seleccionarSlot(btn, slot));
+                    botones.appendChild(btn);
+                });
+                grupo.appendChild(botones);
+                container.appendChild(grupo);
+            });
+        } catch (err) {
+            container.innerHTML = '<p class="text-red-500 text-body-sm pt-2">Error al cargar horarios.</p>';
+            console.error(err);
+        }
+    }
+
+    function seleccionarSlot(btnEl, slot) {
+        // Quitar selección anterior
+        document.querySelectorAll('.slot-btn').forEach(b => {
+            b.classList.remove('bg-primary', 'text-on-primary', 'border-primary');
+        });
+        btnEl.classList.add('bg-primary', 'text-on-primary', 'border-primary');
+        slotSeleccionado = slot;
+        document.getElementById('input-fecha').value = slot.fecha;
+        document.getElementById('input-hora').value = slot.hora;
+        document.getElementById('dispo-psicologo').innerText = `${slot.fecha} a las ${slot.hora.substring(0,5)} hrs`;
+        document.getElementById('ai-badge').classList.add('hidden');
+    }
+
+    // ── CARGAR MIS CITAS ──────────────────────────────────────────────────────
+    async function cargarMisCitas() {
+        try {
+            const res = await fetch(`${BACKEND}/api/citas/mis-citas`, { headers: authHeaders() });
+            if (manejarUnauthorized(res)) return;
+            const data = await res.json();
+            const citas = Array.isArray(data) ? data : (data.citas || []);
+
+            const lista = document.getElementById('lista-citas');
+            lista.innerHTML = '';
+            if (citas.length === 0) {
+                lista.innerHTML = '<p class="text-secondary text-body-sm">No tienes citas agendadas aún.</p>';
+                return;
+            }
+            const colorMap = { PENDIENTE: 'border-primary text-primary', CONFIRMADA: 'border-green-600 text-green-700', CANCELADA: 'border-red-400 text-red-500 opacity-60', COMPLETADA: 'border-zinc-400 text-zinc-500' };
+            citas.forEach(cita => {
+                const node = document.createElement('div');
+                const cls = colorMap[cita.estado] || 'border-primary text-primary';
+                node.className = `bg-white px-4 py-2 rounded-full border flex items-center gap-2 animate-fade-in ${cls}`;
+                node.innerHTML = `
+                    <span class="w-2 h-2 rounded-full bg-current"></span>
+                    <span class="text-body-sm font-bold">${cita.fecha} ${cita.hora ? cita.hora.substring(0,5) : ''} — ${cita.modalidad} (${cita.psicologoNombreCompleto})</span>
+                    <span class="text-[10px] uppercase tracking-wider ml-1 opacity-70">${cita.estado}</span>
+                    ${cita.estado === 'PENDIENTE' ? `<button data-id="${cita.id}" class="btn-cancelar-cita ml-2 text-[10px] text-red-500 hover:underline font-semibold">Cancelar</button>` : ''}
+                `;
+                lista.appendChild(node);
+            });
+            lista.querySelectorAll('.btn-cancelar-cita').forEach(btn => {
+                btn.addEventListener('click', () => cancelarCita(btn.dataset.id));
+            });
+        } catch (err) { console.error('Error al cargar citas:', err); }
+    }
+
+    async function cancelarCita(id) {
+        if (!confirm('¿Deseas cancelar esta cita?')) return;
+        try {
+            const res = await fetch(`${BACKEND}/api/citas/${id}/estado`, {
+                method: 'PUT', headers: authHeaders(),
+                body: JSON.stringify({ estado: 'CANCELADA' })
+            });
+            if (manejarUnauthorized(res)) return;
+            if (res.ok) { mostrarToast('Cita cancelada.'); cargarMisCitas(); }
+            else { const e = await res.json(); mostrarToast(e.error || 'Error al cancelar.', 'error'); }
+        } catch { mostrarToast('Error de conexión.', 'error'); }
+    }
+
+    // ── INIT ──────────────────────────────────────────────────────────────────
     document.addEventListener('DOMContentLoaded', () => {
-        const inputFecha = document.getElementById('input-fecha');
-        const hoyObj = new Date();
-        const anio = hoyObj.getFullYear();
-        const mes = String(hoyObj.getMonth() + 1).padStart(2, '0');
-        const dia = String(hoyObj.getDate()).padStart(2, '0');
-        inputFecha.min = `${anio}-${mes}-${dia}`;
+        cargarPsicologos();
+        cargarMisCitas();
 
-        // RENDERIZAR CITAS DE LA SESIÓN ACTUAL AL RECARGAR O VOLVER A LA PESTAÑA
-        const lista = document.getElementById('lista-citas');
-        const historialCitas = JSON.parse(sessionStorage.getItem('alertasCitas')) || [];
-
-        // Se recorren en orden para mantener la estructura visual correcta
-        historialCitas.forEach(cita => {
-            const nuevaCitaNode = document.createElement('div');
-            nuevaCitaNode.className = "bg-white px-4 py-2 rounded-full border border-primary flex items-center gap-2 animate-fade-in";
-            nuevaCitaNode.innerHTML = `<span class="w-2 h-2 rounded-full bg-primary"></span><span class="text-body-sm text-primary font-bold">${cita.fecha} - ${cita.modalidad} (${cita.profesional})</span>`;
-            lista.appendChild(nuevaCitaNode);
+        // Al cambiar de psicólogo en el select
+        document.getElementById('select-psicologo').addEventListener('change', (e) => {
+            const id = e.target.value;
+            if (id) cargarSlots(id);
+            else {
+                document.getElementById('slots-container').innerHTML = '<p class="text-secondary text-body-sm pt-2">Selecciona un psicólogo para ver sus horarios.</p>';
+                psicologoSeleccionado = null;
+                slotSeleccionado = null;
+                resetearCardPsicologo();
+            }
         });
     });
 
-    const psicologoPorDefecto = {
-        nombre: "Dr. Carlos Martinez",
-        especialidad: "Psicólogo Clínico • TCC Specialist",
-        dispo: "Hoy, 16:30",
-        foto: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=250&q=80",
-        recoTitulo: "RECOMENDACIÓN",
-        recoTexto: "Para tu sesión virtual, asegúrate de estar en un espacio privado con conexión estable. Recomendamos entrar 5 minutos antes para probar audio y video."
-    };
+    // ── CARD PSICÓLOGO (defaults) ─────────────────────────────────────────────
+    function resetearCardPsicologo() {
+        document.getElementById('nombre-psicologo').innerText = 'Dr. Carlos Martinez';
+        document.getElementById('especialidad-psicologo').innerText = 'Psicólogo Clínico • TCC Specialist';
+        document.getElementById('dispo-psicologo').innerText = 'Selecciona un psicólogo';
+    }
 
+    // ── MODALIDAD UI ──────────────────────────────────────────────────────────
     const radioVirtual = document.getElementById('radio-virtual');
     const radioPresencial = document.getElementById('radio-presencial');
     const labelVirtual = document.getElementById('label-virtual');
@@ -317,137 +497,139 @@
             labelVirtual.classList.add('border-primary', 'bg-white');
             labelPresencial.classList.remove('border-primary', 'bg-white');
             mapContainer.classList.add('opacity-50', 'pointer-events-none');
-        } else if (radioPresencial.checked) {
+        } else {
             labelPresencial.classList.add('border-primary', 'bg-white');
             labelVirtual.classList.remove('border-primary', 'bg-white');
             mapContainer.classList.remove('opacity-50', 'pointer-events-none');
         }
     }
-
-    function resetearFormulario() {
-        document.getElementById('form-cita').reset();
-        document.getElementById('input-fecha').value = '';
-        document.getElementById('input-hora').value = '';
-        document.getElementById('ai-badge').classList.add('hidden');
-
-        document.getElementById('nombre-psicologo').innerText = psicologoPorDefecto.nombre;
-        document.getElementById('especialidad-psicologo').innerText = psicologoPorDefecto.especialidad;
-        document.getElementById('dispo-psicologo').innerText = psicologoPorDefecto.dispo;
-        document.getElementById('foto-psicologo').src = psicologoPorDefecto.foto;
-
-        document.getElementById('reco-titulo').innerText = psicologoPorDefecto.recoTitulo;
-        document.getElementById('reco-texto').innerText = psicologoPorDefecto.recoTexto;
-
-        document.getElementById('input-fecha').disabled = false;
-        document.getElementById('input-hora').disabled = false;
-        radioVirtual.disabled = false;
-        radioPresencial.disabled = false;
-
-        labelVirtual.classList.remove('pointer-events-none', 'opacity-70');
-        labelPresencial.classList.remove('pointer-events-none', 'opacity-70');
-
-        radioVirtual.checked = true;
-        actualizarDisenoModalidad();
-    }
-
     radioVirtual.addEventListener('change', actualizarDisenoModalidad);
     radioPresencial.addEventListener('change', actualizarDisenoModalidad);
     actualizarDisenoModalidad();
 
-    // --- LÓGICA DE RECOMENDACIÓN ALEATORIA DE IA ---
-    document.getElementById('btn-ia-auto').addEventListener('click', () => {
+    // ── RESETEAR FORMULARIO ───────────────────────────────────────────────────
+    function resetearFormulario() {
+        document.getElementById('select-psicologo').value = '';
+        document.getElementById('slots-container').innerHTML = '<p class="text-secondary text-body-sm pt-2">Selecciona un psicólogo para ver sus horarios.</p>';
+        document.getElementById('input-fecha').value = '';
+        document.getElementById('input-hora').value = '';
+        document.getElementById('ai-badge').classList.add('hidden');
+        psicologoSeleccionado = null;
+        slotSeleccionado = null;
+        radioVirtual.checked = true;
+        radioVirtual.disabled = false;
+        radioPresencial.disabled = false;
+        labelVirtual.classList.remove('pointer-events-none', 'opacity-70');
+        labelPresencial.classList.remove('pointer-events-none', 'opacity-70');
+        actualizarDisenoModalidad();
+        resetearCardPsicologo();
+        document.getElementById('reco-titulo').innerText = 'RECOMENDACIÓN';
+        document.getElementById('reco-texto').innerText = 'Para tu sesión virtual, asegúrate de estar en un espacio privado con conexión estable.';
+    }
+
+    document.getElementById('btn-cancelar').addEventListener('click', resetearFormulario);
+
+    // ── BOTÓN IA ──────────────────────────────────────────────────────────────
+    document.getElementById('btn-ia-auto').addEventListener('click', async () => {
         const loading = document.getElementById('ai-loading');
         loading.classList.remove('hidden');
+        loading.classList.add('flex');
 
-        setTimeout(() => {
-            loading.classList.add('hidden');
+        if (basePsicologos.length === 0) await cargarPsicologos();
+        if (basePsicologos.length === 0) {
+            loading.classList.add('hidden'); loading.classList.remove('flex');
+            mostrarToast('No hay psicólogos disponibles.', 'error');
+            return;
+        }
 
-            const psicologoElegido = basePsicologos[Math.floor(Math.random() * basePsicologos.length)];
+        // Elegir psicólogo con disponibilidad real
+        let elegido = null, slots = [];
+        const orden = [...basePsicologos].sort(() => Math.random() - 0.5);
+        for (const p of orden) {
+            try {
+                const res = await fetch(`${BACKEND}/api/psicologos/${p.id}`, { headers: authHeaders() });
+                if (manejarUnauthorized(res)) return;
+                const detalle = await res.json();
+                if ((detalle.horariosDisponibles || []).length > 0) {
+                    elegido = detalle;
+                    slots = detalle.horariosDisponibles;
+                    break;
+                }
+            } catch { /* seguir buscando */ }
+        }
 
-            const hoy = new Date();
-            hoy.setDate(hoy.getDate() + Math.floor(Math.random() * 4) + 1);
-            const fechaString = hoy.toISOString().split('T')[0];
-            const horasDisponibles = ["09:00", "11:30", "15:00", "17:30"];
-            const horaString = horasDisponibles[Math.floor(Math.random() * horasDisponibles.length)];
+        loading.classList.add('hidden');
+        loading.classList.remove('flex');
 
-            document.getElementById('input-fecha').value = fechaString;
-            document.getElementById('input-hora').value = horaString;
+        if (!elegido) {
+            mostrarToast('No hay horarios disponibles en este momento.', 'error');
+            return;
+        }
 
-            if (psicologoElegido.modalidad === 'virtual') {
-                radioVirtual.checked = true;
-            } else {
-                radioPresencial.checked = true;
-            }
-            actualizarDisenoModalidad();
+        // Elegir slot aleatorio
+        const slot = slots[Math.floor(Math.random() * slots.length)];
 
-            document.getElementById('input-fecha').disabled = true;
-            document.getElementById('input-hora').disabled = true;
-            radioVirtual.disabled = true;
-            radioPresencial.disabled = true;
+        // Rellenar select y simular carga de slots
+        document.getElementById('select-psicologo').value = elegido.id;
+        await cargarSlots(elegido.id);
 
-            labelVirtual.classList.add('pointer-events-none', 'opacity-70');
-            labelPresencial.classList.add('pointer-events-none', 'opacity-70');
+        // Marcar slot elegido
+        const btnSlot = document.querySelector(`.slot-btn[data-fecha="${slot.fecha}"][data-hora="${slot.hora}"]`);
+        if (btnSlot) seleccionarSlot(btnSlot, slot);
+        else {
+            document.getElementById('input-fecha').value = slot.fecha;
+            document.getElementById('input-hora').value = slot.hora;
+        }
 
-            document.getElementById('nombre-psicologo').innerText = `${psicologoElegido.nombre} ${psicologoElegido.apellido}`;
-            document.getElementById('especialidad-psicologo').innerText = psicologoElegido.especialidad;
-            document.getElementById('dispo-psicologo').innerText = `${fechaString} a las ${horaString} hrs`;
-            document.getElementById('foto-psicologo').src = 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=250&q=80';
+        psicologoSeleccionado = basePsicologos.find(p => p.id == elegido.id) || { id: elegido.id, nombre: elegido.nombre, apellido: elegido.apellido, especialidad: elegido.especialidad, modalidad: elegido.modalidad };
 
-            document.getElementById('reco-titulo').innerText = "RECOMENDACIÓN OPTIMIZADA POR IA ✨";
-            document.getElementById('reco-texto').innerText = `Seleccionamos a ${psicologoElegido.nombre} ${psicologoElegido.apellido} por su especialidad en ${psicologoElegido.especialidad}.`;
-
-            document.getElementById('ai-badge').classList.remove('hidden');
-        }, 1000);
+        document.getElementById('reco-titulo').innerText = 'RECOMENDACIÓN OPTIMIZADA POR IA ✨';
+        document.getElementById('reco-texto').innerText = `Seleccionamos a ${elegido.nombre} ${elegido.apellido} por su especialidad en ${elegido.especialidad}.`;
+        document.getElementById('ai-badge').classList.remove('hidden');
     });
 
-    // --- BOTÓN CANCELAR ---
-    document.getElementById('btn-cancelar').addEventListener('click', () => {
-        resetearFormulario();
-    });
-
-    // --- ENVIAR FORMULARIO Y GUARDAR EN SESSIONSTORAGE ---
-    document.getElementById('form-cita').addEventListener('submit', (e) => {
+    // ── SUBMIT FORMULARIO → POST /api/citas ───────────────────────────────────
+    document.getElementById('form-cita').addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        const inputFecha = document.getElementById('input-fecha');
-        const inputHora = document.getElementById('input-hora');
+        const fecha = document.getElementById('input-fecha').value;
+        const hora = document.getElementById('input-hora').value;
+        const modalidad = radioVirtual.checked ? 'virtual' : 'presencial';
 
-        const fechaBloqueada = inputFecha.disabled;
-        const horaBloqueada = inputHora.disabled;
+        if (!psicologoSeleccionado) {
+            mostrarToast('Selecciona un psicólogo primero.', 'error'); return;
+        }
+        if (!fecha || !hora) {
+            mostrarToast('Selecciona un horario disponible.', 'error'); return;
+        }
 
-        inputFecha.disabled = false;
-        inputHora.disabled = false;
-
-        const fecha = inputFecha.value;
-        const hora = inputHora.value;
-        const doctor = document.getElementById('nombre-psicologo').innerText;
-        const mod = radioVirtual.checked ? 'Virtual' : 'Presencial';
-
-        inputFecha.disabled = fechaBloqueada;
-        inputHora.disabled = horaBloqueada;
-
-        alert(`¡Cita con ${doctor} agendada con éxito para el ${fecha} a las ${hora} (${mod})!`);
-
-        const nuevaNotificacionCita = {
-            id: Date.now(),
-            profesional: doctor,
+        const payload = {
+            psicologoId: psicologoSeleccionado.id,
             fecha: fecha,
-            hora: hora,
-            modalidad: mod,
-            tiempo: "Hace un momento"
+            hora: hora.length === 5 ? hora + ':00' : hora,
+            modalidad: modalidad
         };
 
-        let historialCitas = JSON.parse(sessionStorage.getItem('alertasCitas')) || [];
-        historialCitas.unshift(nuevaNotificacionCita);
-        sessionStorage.setItem('alertasCitas', JSON.stringify(historialCitas));
+        try {
+            const res = await fetch(`${BACKEND}/api/citas`, {
+                method: 'POST', headers: authHeaders(),
+                body: JSON.stringify(payload)
+            });
+            if (manejarUnauthorized(res)) return;
+            const data = await res.json();
 
-        const lista = document.getElementById('lista-citas');
-        const nuevaCitaNode = document.createElement('div');
-        nuevaCitaNode.className = "bg-white px-4 py-2 rounded-full border border-primary flex items-center gap-2 animate-bounce";
-        nuevaCitaNode.innerHTML = `<span class="w-2 h-2 rounded-full bg-primary"></span><span class="text-body-sm text-primary font-bold">${fecha} - ${mod} (${doctor})</span>`;
-        lista.insertBefore(nuevaCitaNode, lista.firstChild);
-
-        resetearFormulario();
+            if (res.ok) {
+                mostrarToast(`¡Cita con ${data.psicologoNombreCompleto} agendada para el ${data.fecha} a las ${data.hora ? data.hora.substring(0,5) : hora}!`);
+                guardarNotificacion(data);   // ← guarda en sessionStorage para notificaciones.html
+                resetearFormulario();
+                cargarMisCitas();
+            } else {
+                mostrarToast(data.error || 'Error al agendar la cita.', 'error');
+            }
+        } catch (err) {
+            mostrarToast('Error de conexión con el servidor.', 'error');
+            console.error(err);
+        }
     });
 </script>
 <!-- Lógica Interactiva en JavaScript -->
