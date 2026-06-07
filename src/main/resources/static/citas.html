@@ -212,6 +212,10 @@
                         </div>
                         <div class="bg-surface p-4 rounded-lg space-y-2">
                             <div class="flex justify-between text-body-sm">
+                                <span class="text-secondary">Modalidad:</span>
+                                <span id="modalidad-psicologo" class="text-primary font-semibold">-</span>
+                            </div>
+                            <div class="flex justify-between text-body-sm">
                                 <span class="text-secondary">Próxima disponible:</span>
                                 <span id="dispo-psicologo" class="text-primary font-bold">Hoy, 16:30</span>
                             </div>
@@ -318,6 +322,12 @@
             basePsicologos = Array.isArray(data) ? data : (data.psicologos || []);
 
             const sel = document.getElementById('select-psicologo');
+            if (basePsicologos.length === 0) {
+                sel.innerHTML = '<option value="">No hay psicólogos disponibles en este momento</option>';
+                document.getElementById('slots-container').innerHTML = '<p class="text-amber-600 text-body-sm pt-2 font-semibold">No hay psicólogos disponibles en este momento. Por favor, intente más tarde.</p>';
+                return;
+            }
+
             sel.innerHTML = '<option value="">-- Selecciona un psicólogo --</option>';
             basePsicologos.forEach(p => {
                 const opt = document.createElement('option');
@@ -349,6 +359,7 @@
             if (psicologoSeleccionado) {
                 document.getElementById('nombre-psicologo').innerText = `${detalle.nombre} ${detalle.apellido}`;
                 document.getElementById('especialidad-psicologo').innerText = detalle.especialidad || '';
+                document.getElementById('modalidad-psicologo').innerText = detalle.modalidad || '-';
                 document.getElementById('dispo-psicologo').innerText = slots.length > 0
                     ? `${slots[0].fecha} a las ${slots[0].hora.substring(0,5)}`
                     : 'Sin disponibilidad próxima';
@@ -425,30 +436,36 @@
             const lista = document.getElementById('lista-citas');
             lista.innerHTML = '';
             if (citas.length === 0) {
-                lista.innerHTML = '<p class="text-secondary text-body-sm">No tienes citas agendadas aún.</p>';
+                lista.innerHTML = '<p class="text-secondary text-body-sm font-semibold">No existen citas registradas.</p>';
                 return;
             }
             const colorMap = { PENDIENTE: 'border-primary text-primary', CONFIRMADA: 'border-green-600 text-green-700', CANCELADA: 'border-red-400 text-red-500 opacity-60', COMPLETADA: 'border-zinc-400 text-zinc-500' };
             citas.forEach(cita => {
                 const node = document.createElement('div');
                 const cls = colorMap[cita.estado] || 'border-primary text-primary';
-                node.className = `bg-white px-4 py-2 rounded-full border flex items-center gap-2 animate-fade-in ${cls}`;
+                node.className = `bg-white px-4 py-2 rounded-full border flex items-center gap-2 animate-fade-in cursor-pointer hover:bg-zinc-50 transition-colors ${cls}`;
                 node.innerHTML = `
                     <span class="w-2 h-2 rounded-full bg-current"></span>
-                    <span class="text-body-sm font-bold">${cita.fecha} ${cita.hora ? cita.hora.substring(0,5) : ''} — ${cita.modalidad} (${cita.psicologoNombreCompleto})</span>
+                    <span class="text-body-sm font-bold btn-ver-detalle" data-id="${cita.id}">${cita.fecha} ${cita.hora ? cita.hora.substring(0,5) : ''} — ${cita.modalidad} (${cita.psicologoNombreCompleto})</span>
                     <span class="text-[10px] uppercase tracking-wider ml-1 opacity-70">${cita.estado}</span>
                     ${cita.estado === 'PENDIENTE' ? `<button data-id="${cita.id}" class="btn-cancelar-cita ml-2 text-[10px] text-red-500 hover:underline font-semibold">Cancelar</button>` : ''}
                 `;
+                node.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('btn-cancelar-cita')) return;
+                    mostrarDetallesCita(cita.id);
+                });
                 lista.appendChild(node);
             });
             lista.querySelectorAll('.btn-cancelar-cita').forEach(btn => {
-                btn.addEventListener('click', () => cancelarCita(btn.dataset.id));
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    cancelarCita(btn.dataset.id);
+                });
             });
         } catch (err) { console.error('Error al cargar citas:', err); }
     }
 
     async function cancelarCita(id) {
-        if (!confirm('¿Deseas cancelar esta cita?')) return;
         try {
             const res = await fetch(`${BACKEND}/api/citas/${id}/estado`, {
                 method: 'PUT', headers: authHeaders(),
@@ -460,10 +477,65 @@
         } catch { mostrarToast('Error de conexión.', 'error'); }
     }
 
+    async function mostrarDetallesCita(id) {
+        try {
+            const res = await fetch(`${BACKEND}/api/citas/${id}`, { headers: authHeaders() });
+            if (manejarUnauthorized(res)) return;
+            if (!res.ok) {
+                const e = await res.json();
+                mostrarToast(e.error || 'Error al obtener detalles.', 'error');
+                return;
+            }
+            const detail = await res.json();
+            
+            document.getElementById('detalle-cita-id').textContent = detail.id;
+            document.getElementById('detalle-cita-estado').textContent = detail.estado;
+            document.getElementById('detalle-cita-fecha').textContent = detail.fecha;
+            document.getElementById('detalle-cita-hora').textContent = detail.hora ? detail.hora.substring(0, 5) : '';
+            document.getElementById('detalle-cita-modalidad').textContent = detail.modalidad;
+            document.getElementById('detalle-cita-psicologo').textContent = detail.psicologoNombreCompleto;
+            document.getElementById('detalle-cita-especialidad').textContent = detail.psicologoEspecialidad || 'Especialista';
+            document.getElementById('detalle-cita-paciente').textContent = detail.estudianteNombreCompleto;
+
+            const estadoEl = document.getElementById('detalle-cita-estado');
+            estadoEl.className = 'font-bold';
+            if (detail.estado === 'PENDIENTE') estadoEl.classList.add('text-primary');
+            else if (detail.estado === 'CONFIRMADA') estadoEl.classList.add('text-green-600');
+            else if (detail.estado === 'CANCELADA') estadoEl.classList.add('text-red-500');
+            else if (detail.estado === 'COMPLETADA') estadoEl.classList.add('text-zinc-500');
+
+            const btnCancelModal = document.getElementById('btn-cancelar-cita-modal');
+            if (detail.estado === 'PENDIENTE') {
+                btnCancelModal.classList.remove('hidden');
+                btnCancelModal.onclick = async () => {
+                    if (confirm('¿Deseas cancelar esta cita?')) {
+                        await cancelarCita(detail.id);
+                        cerrarModalDetalles();
+                    }
+                };
+            } else {
+                btnCancelModal.classList.add('hidden');
+            }
+
+            document.getElementById('modal-detalle-cita').classList.remove('hidden');
+        } catch (err) {
+            console.error(err);
+            mostrarToast('Error de conexión.', 'error');
+        }
+    }
+
+    function cerrarModalDetalles() {
+        document.getElementById('modal-detalle-cita').classList.add('hidden');
+    }
+
     // ── INIT ──────────────────────────────────────────────────────────────────
     document.addEventListener('DOMContentLoaded', () => {
         cargarPsicologos();
         cargarMisCitas();
+
+        document.getElementById('btn-cerrar-modal-detalle').addEventListener('click', cerrarModalDetalles);
+        document.getElementById('btn-cerrar-modal-detalle-action').addEventListener('click', cerrarModalDetalles);
+        document.getElementById('modal-detalle-cita').querySelector('.absolute.inset-0.bg-black\\/60').addEventListener('click', cerrarModalDetalles);
 
         // Al cambiar de psicólogo en el select
         document.getElementById('select-psicologo').addEventListener('change', (e) => {
@@ -482,6 +554,7 @@
     function resetearCardPsicologo() {
         document.getElementById('nombre-psicologo').innerText = 'Dr. Carlos Martinez';
         document.getElementById('especialidad-psicologo').innerText = 'Psicólogo Clínico • TCC Specialist';
+        document.getElementById('modalidad-psicologo').innerText = '-';
         document.getElementById('dispo-psicologo').innerText = 'Selecciona un psicólogo';
     }
 
@@ -625,6 +698,15 @@
                 cargarMisCitas();
             } else {
                 mostrarToast(data.error || 'Error al agendar la cita.', 'error');
+                // Proponer horarios alternativos volviendo a cargar los slots actualizados (HU005)
+                if (psicologoSeleccionado) {
+                    cargarSlots(psicologoSeleccionado.id);
+                    const slotsContainer = document.getElementById('slots-container');
+                    const warningMsg = document.createElement('p');
+                    warningMsg.className = 'text-red-600 text-xs font-bold mt-2 animate-bounce';
+                    warningMsg.textContent = 'El horario seleccionado ya no está disponible. Por favor, selecciona una de las siguientes opciones alternativas:';
+                    slotsContainer.prepend(warningMsg);
+                }
             }
         } catch (err) {
             mostrarToast('Error de conexión con el servidor.', 'error');
@@ -660,5 +742,70 @@
         });
     });
 </script>
+
+<!-- Modal de Detalles de Cita (HU006 Scenario 3) -->
+<div id="modal-detalle-cita" class="fixed inset-0 z-50 flex items-center justify-center hidden font-manrope">
+    <!-- Backdrop -->
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+    
+    <!-- Modal content -->
+    <div class="bg-white border border-zinc-200 rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl relative z-10 animate-fade-in font-manrope">
+        <button id="btn-cerrar-modal-detalle" class="absolute top-4 right-4 p-1 text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 rounded-full transition-all">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+        
+        <div class="flex items-center gap-3 mb-6">
+            <div class="w-12 h-12 bg-zinc-100 rounded-xl flex items-center justify-center border border-zinc-200">
+                <span class="material-symbols-outlined text-primary text-[28px]">calendar_month</span>
+            </div>
+            <div>
+                <h3 class="text-lg font-bold text-zinc-900">Detalles de la Cita</h3>
+                <p class="text-xs text-zinc-400">ID de Registro: #<span id="detalle-cita-id">-</span></p>
+            </div>
+        </div>
+        
+        <div class="space-y-4 mb-6">
+            <div class="bg-zinc-50 p-4 rounded-xl space-y-3 text-sm border border-zinc-100">
+                <div class="flex justify-between">
+                    <span class="text-zinc-500 font-medium">Estado:</span>
+                    <span id="detalle-cita-estado" class="font-bold">-</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-zinc-500 font-medium">Fecha:</span>
+                    <span id="detalle-cita-fecha" class="text-zinc-800 font-semibold">-</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-zinc-500 font-medium">Hora:</span>
+                    <span id="detalle-cita-hora" class="text-zinc-800 font-semibold">-</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-zinc-500 font-medium">Modalidad:</span>
+                    <span id="detalle-cita-modalidad" class="text-zinc-800 font-semibold capitalize">-</span>
+                </div>
+            </div>
+            
+            <div class="bg-zinc-50 p-4 rounded-xl space-y-3 text-sm border border-zinc-100">
+                <div>
+                    <span class="text-zinc-500 text-xs font-bold uppercase tracking-wider block mb-1">Especialista</span>
+                    <p id="detalle-cita-psicologo" class="text-zinc-900 font-bold">-</p>
+                    <p id="detalle-cita-especialidad" class="text-zinc-500 text-xs">-</p>
+                </div>
+                <div class="pt-2 border-t border-zinc-200/60">
+                    <span class="text-zinc-500 text-xs font-bold uppercase tracking-wider block mb-1">Paciente</span>
+                    <p id="detalle-cita-paciente" class="text-zinc-900 font-bold">-</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flex gap-3">
+            <button id="btn-cancelar-cita-modal" class="hidden flex-grow py-3 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl font-semibold text-sm transition-all border border-red-200">
+                Cancelar Cita
+            </button>
+            <button id="btn-cerrar-modal-detalle-action" class="flex-grow py-3 bg-zinc-900 hover:bg-black text-white rounded-xl font-semibold text-sm transition-all">
+                Cerrar
+            </button>
+        </div>
+    </div>
+</div>
 </body>
 </html>

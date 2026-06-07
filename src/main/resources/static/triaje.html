@@ -239,6 +239,11 @@
 </div>
 
 <script>
+    const token = sessionStorage.getItem('token');
+    if (!token) {
+        window.location.href = 'login.html';
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
         const botonPerfil = document.getElementById('botonPerfil');
         const menuDesplegable = document.getElementById('menuDesplegable');
@@ -260,6 +265,7 @@
         // Evento para simular el cierre de sesión y redirigir a login.html
         botonCerrarSesion.addEventListener('click', (e) => {
             e.preventDefault();
+            sessionStorage.clear();
             window.location.href = 'login.html';
         });
     });
