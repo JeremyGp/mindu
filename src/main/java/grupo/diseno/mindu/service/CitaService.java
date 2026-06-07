@@ -2,13 +2,18 @@ package grupo.diseno.mindu.service;
 
 import grupo.diseno.mindu.dto.AgendarCitaRequest;
 import grupo.diseno.mindu.dto.CitaResponseDTO;
+import grupo.diseno.mindu.dto.RecomendacionCitaDTO;
+import grupo.diseno.mindu.integration.AIService;
 import grupo.diseno.mindu.model.*;
 import grupo.diseno.mindu.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 @RequiredArgsConstructor
@@ -19,6 +24,7 @@ public class CitaService {
     private final PsicologoRepository psicologoRepository;
     private final UsuarioRepository usuarioRepository;
     private final DisponibilidadRepository disponibilidadRepository;
+    private final AIService aiService;
 
     @Transactional
     public CitaResponseDTO agendarCita(AgendarCitaRequest request, String estudianteCorreo) {
@@ -102,6 +108,47 @@ public class CitaService {
         return citas.stream()
                 .map(this::mapToDTO)
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<RecomendacionCitaDTO> generarRecomendacionesIA(String estudianteCorreo) {
+        // GIVEN: se recopilan todos los slots disponibles y validados como candidatos
+        Estudiante estudiante = estudianteRepository.findByCorreo(estudianteCorreo)
+                .orElseThrow(() -> new IllegalArgumentException("Estudiante no encontrado"));
+
+        if (!estudiante.getActivo()) {
+            throw new IllegalArgumentException("La cuenta del estudiante está inactiva");
+        }
+
+        // Construir lista de candidatos válidos (disponibilidad confirmada, sin cruces)
+        List<RecomendacionCitaDTO> candidatos = new ArrayList<>();
+        for (Psicologo psicologo : psicologoRepository.findByActivoTrue()) {
+            disponibilidadRepository
+                    .findByPsicologoIdAndDisponibleTrueAndFechaGreaterThanEqualOrderByFechaAscHoraAsc(
+                            psicologo.getId(), LocalDate.now())
+                    .stream()
+                    .filter(d -> !citaRepository.existsOverlappingPsicologo(
+                            psicologo.getId(), d.getFecha(), d.getHora(), EstadoCita.CANCELADA))
+                    .filter(d -> !citaRepository.existsOverlappingEstudiante(
+                            estudiante.getId(), d.getFecha(), d.getHora(), EstadoCita.CANCELADA))
+                    .map(d -> RecomendacionCitaDTO.builder()
+                            .psicologoId(psicologo.getId())
+                            .psicologoNombreCompleto(psicologo.getNombre() + " " + psicologo.getApellido())
+                            .psicologoEspecialidad(psicologo.getEspecialidad())
+                            .modalidad(psicologo.getModalidad())
+                            .fecha(d.getFecha())
+                            .hora(d.getHora())
+                            .build())
+                    .forEach(candidatos::add);
+        }
+
+        if (candidatos.isEmpty()) {
+            return List.of();
+        }
+
+        // WHEN: la IA analiza los candidatos y selecciona las mejores recomendaciones
+        // AIService delega a OpenAIConnector y cae en fallback si la API no está configurada
+        return aiService.recomendarCitas(estudiante, candidatos);
     }
 
     @Transactional

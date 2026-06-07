@@ -3,6 +3,7 @@ package grupo.diseno.mindu.controller;
 import grupo.diseno.mindu.dto.ActualizarEstadoRequest;
 import grupo.diseno.mindu.dto.AgendarCitaRequest;
 import grupo.diseno.mindu.dto.CitaResponseDTO;
+import grupo.diseno.mindu.dto.RecomendacionCitaDTO;
 import grupo.diseno.mindu.service.CitaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +39,22 @@ public class CitaController {
                 return ResponseEntity.ok(Map.of(
                         "mensaje", "No tienes citas registradas actualmente.",
                         "citas", response
+                ));
+            }
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @GetMapping("/recomendaciones-ia")
+    public ResponseEntity<?> generarRecomendacionesIA(Principal principal) {
+        try {
+            List<RecomendacionCitaDTO> response = citaService.generarRecomendacionesIA(principal.getName());
+            if (response.isEmpty()) {
+                return ResponseEntity.ok(Map.of(
+                        "mensaje", "No hay recomendaciones disponibles en este momento.",
+                        "recomendaciones", response
                 ));
             }
             return ResponseEntity.ok(response);

@@ -13,6 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -180,6 +181,44 @@ class CitaServiceTest {
 
         assertEquals("Ya tienes otra cita programada para esta misma fecha y hora", exception.getMessage());
         verify(citaRepository, never()).save(any(Cita.class));
+    }
+
+    @Test
+    void generarRecomendacionesIA_Exito() {
+        // Arrange
+        when(estudianteRepository.findByCorreo(estudiante.getCorreo())).thenReturn(Optional.of(estudiante));
+        when(psicologoRepository.findByActivoTrue()).thenReturn(List.of(psicologo));
+        when(disponibilidadRepository.findByPsicologoIdAndDisponibleTrueAndFechaGreaterThanEqualOrderByFechaAscHoraAsc(
+                eq(psicologo.getId()), any(LocalDate.class))).thenReturn(List.of(disponibilidad));
+        when(citaRepository.existsOverlappingPsicologo(eq(psicologo.getId()), eq(disponibilidad.getFecha()), eq(disponibilidad.getHora()), eq(EstadoCita.CANCELADA))).thenReturn(false);
+        when(citaRepository.existsOverlappingEstudiante(eq(estudiante.getId()), eq(disponibilidad.getFecha()), eq(disponibilidad.getHora()), eq(EstadoCita.CANCELADA))).thenReturn(false);
+
+        // Act
+        var result = citaService.generarRecomendacionesIA(estudiante.getCorreo());
+
+        // Assert
+        assertEquals(1, result.size());
+        assertEquals(psicologo.getId(), result.get(0).getPsicologoId());
+        assertEquals(disponibilidad.getFecha(), result.get(0).getFecha());
+        assertEquals(disponibilidad.getHora(), result.get(0).getHora());
+        assertEquals(1, result.get(0).getPrioridad());
+    }
+
+    @Test
+    void generarRecomendacionesIA_ExcluyeHorarioOcupadoPorEstudiante() {
+        // Arrange
+        when(estudianteRepository.findByCorreo(estudiante.getCorreo())).thenReturn(Optional.of(estudiante));
+        when(psicologoRepository.findByActivoTrue()).thenReturn(List.of(psicologo));
+        when(disponibilidadRepository.findByPsicologoIdAndDisponibleTrueAndFechaGreaterThanEqualOrderByFechaAscHoraAsc(
+                eq(psicologo.getId()), any(LocalDate.class))).thenReturn(List.of(disponibilidad));
+        when(citaRepository.existsOverlappingPsicologo(eq(psicologo.getId()), eq(disponibilidad.getFecha()), eq(disponibilidad.getHora()), eq(EstadoCita.CANCELADA))).thenReturn(false);
+        when(citaRepository.existsOverlappingEstudiante(eq(estudiante.getId()), eq(disponibilidad.getFecha()), eq(disponibilidad.getHora()), eq(EstadoCita.CANCELADA))).thenReturn(true);
+
+        // Act
+        var result = citaService.generarRecomendacionesIA(estudiante.getCorreo());
+
+        // Assert
+        assertTrue(result.isEmpty());
     }
 
     @Test
