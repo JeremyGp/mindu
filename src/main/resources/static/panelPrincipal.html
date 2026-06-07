@@ -102,10 +102,10 @@
             <div class="flex justify-between items-end mb-stack-lg font-manrope">
                 <div>
                     <span class="font-label-caps text-secondary uppercase tracking-wider text-[11px]">RESUMEN DEL PANEL</span>
-                    <h2 class="font-headline-lg text-headline-lg text-primary mt-1">Bienvenida de nuevo, Sarah.</h2>
+                    <h2 id="saludo-bienvenida" class="font-headline-lg text-headline-lg text-primary mt-1">Bienvenido(a) de nuevo...</h2>
                 </div>
                 <div class="text-right text-body-sm text-secondary">
-                    <p>Miércoles, 24 Oct 2023</p>
+                    <p id="fecha-actual">Miércoles, 24 Oct 2023</p>
                     <p class="font-bold text-primary flex items-center justify-end gap-1 mt-1">
                         <span class="w-2 h-2 rounded-full bg-green-500"></span> Estado: Estable
                     </p>
@@ -156,26 +156,11 @@
                     <div>
                         <div class="flex justify-between items-center mb-6">
                             <h4 class="font-headline-md text-[18px] text-primary">Sesiones Próximas</h4>
-                            <span class="bg-surface-container px-2 py-1 rounded text-[10px] font-bold text-secondary">2 PROGRAMADAS</span>
+                            <span id="contador-sesiones" class="bg-surface-container px-2 py-1 rounded text-[10px] font-bold text-secondary">0 PROGRAMADAS</span>
                         </div>
                         
-                        <div class="space-y-4">
-                            <div class="flex items-center gap-3">
-                                <img class="w-10 h-10 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBIwuCsK6JkND3yOvimMCljeC0buQrh7b7KREBjOW-GGnQi4imOiYo1jlGQQir_1laMmzOt_3pp0WB2d2PoeHJP4BhvsRfSdLlH2vskwh8zfgUXQAYmdXWO_t7FWJ6qRP71FcE9ac2CFd_41mXXj9cG4Zhk9MdH_CA-GiCkuLQctNC7wQjlukV3vBLORha3mzVFrTB8mrTkj6HzLQ3tiPTF6dbeVs3fUnxHeANUbJAkQSl_s5L4r0YSl_TedcHU2hJvBQTSZBr2kpg" alt="Dra. Elena Wright"/>
-                                <div>
-                                    <p class="text-body-sm font-bold text-primary">Dra. Elena Wright</p>
-                                    <p class="text-[12px] text-secondary">Especialista en Terapia TCC</p>
-                                    <p class="text-[11px] text-secondary mt-0.5">🗓️ Oct 25 &nbsp;🕒 14:00</p>
-                                </div>
-                            </div>
-                            <div class="flex items-center gap-3 pt-3 border-t border-surface-container-low">
-                                <img class="w-10 h-10 rounded-full object-cover" src="http://googleusercontent.com/profile/picture/3" alt="Dr. Marcus Chen"/>
-                                <div>
-                                    <p class="text-body-sm font-bold text-primary">Dr. Marcus Chen</p>
-                                    <p class="text-[12px] text-secondary">Revisión de Higiene del Sueño</p>
-                                    <p class="text-[11px] text-secondary mt-0.5">🗓️ Oct 28 &nbsp;🕒 09:30</p>
-                                </div>
-                            </div>
+                        <div id="sesiones-container" class="space-y-4">
+                            <p class="text-zinc-500 text-sm">Cargando próximas sesiones...</p>
                         </div>
                     </div>
                 </div>
@@ -245,14 +230,28 @@
 
 <!-- Lógica Interactiva en JavaScript -->
 <script>
+    const BACKEND = 'http://localhost:8080';
+    const token = sessionStorage.getItem('token');
+    if (!token) {
+        window.location.href = 'login.html';
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
         const botonPerfil = document.getElementById('botonPerfil');
         const menuDesplegable = document.getElementById('menuDesplegable');
         const botonCerrarSesion = document.getElementById('botonCerrarSesion');
 
+        // Poner fecha actual
+        const opcionesFecha = { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' };
+        document.getElementById('fecha-actual').textContent = new Date().toLocaleDateString('es-PE', opcionesFecha);
+
+        // Saludo dinámico
+        const nombreUsuario = sessionStorage.getItem('usuarioNombre') || 'Usuario';
+        document.getElementById('saludo-bienvenida').textContent = `Bienvenido(a) de nuevo, ${nombreUsuario}.`;
+
         // Alternar la visibilidad del menú al hacer clic en el avatar
         botonPerfil.addEventListener('click', (e) => {
-            e.stopPropagation(); // Evita que el evento cierre el menú inmediatamente
+            e.stopPropagation();
             menuDesplegable.classList.toggle('hidden');
         });
 
@@ -263,14 +262,68 @@
             }
         });
 
-        // Evento para simular el cierre de sesión y redirigir a login.html
+        // Cierre de sesión seguro (HU017)
         botonCerrarSesion.addEventListener('click', (e) => {
             e.preventDefault();
-            
-            // Aquí en un futuro tus compañeros añadirán la lógica para limpiar tokens o sesiones reales.
-            // Por ahora, redirige perfectamente al Login
+            sessionStorage.clear();
             window.location.href = 'login.html';
         });
+
+        // Cargar citas próximas dinámicamente (HU006)
+        async function cargarProximasSesiones() {
+            const container = document.getElementById('sesiones-container');
+            const contador = document.getElementById('contador-sesiones');
+            try {
+                const res = await fetch(`${BACKEND}/api/citas/mis-citas`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (res.status === 401 || res.status === 403) {
+                    sessionStorage.clear();
+                    window.location.href = 'login.html';
+                    return;
+                }
+                const data = await res.json();
+                const citas = Array.isArray(data) ? data : (data.citas || []);
+                
+                // Filtrar citas activas (no canceladas ni completadas)
+                const proximas = citas.filter(c => c.estado === 'PENDIENTE' || c.estado === 'CONFIRMADA');
+                
+                contador.textContent = `${proximas.length} PROGRAMADA${proximas.length !== 1 ? 'S' : ''}`;
+                
+                if (proximas.length === 0) {
+                    container.innerHTML = '<p class="text-zinc-500 text-sm">No tienes citas registradas actualmente.</p>';
+                    return;
+                }
+
+                container.innerHTML = '';
+                // Mostrar un máximo de 2
+                proximas.slice(0, 2).forEach((cita, idx) => {
+                    const item = document.createElement('div');
+                    item.className = `flex items-center gap-3 ${idx > 0 ? 'pt-3 border-t border-surface-container-low' : ''}`;
+                    
+                    const options = { month: 'short', day: 'numeric' };
+                    const dateFormatted = new Date(cita.fecha + 'T00:00:00').toLocaleDateString('es-PE', options);
+                    const timeFormatted = cita.hora ? cita.hora.substring(0, 5) : '';
+
+                    item.innerHTML = `
+                        <div class="w-10 h-10 bg-zinc-100 rounded-full flex items-center justify-center text-zinc-600 font-bold border border-zinc-200 text-sm flex-shrink-0">
+                            ${cita.psicologoNombreCompleto ? cita.psicologoNombreCompleto.charAt(0) : 'P'}
+                        </div>
+                        <div>
+                            <p class="text-body-sm font-bold text-primary">${cita.psicologoNombreCompleto}</p>
+                            <p class="text-[12px] text-secondary">${cita.psicologoEspecialidad || 'Especialista'}</p>
+                            <p class="text-[11px] text-secondary mt-0.5">🗓️ ${dateFormatted} &nbsp;🕒 ${timeFormatted} &nbsp;(${cita.modalidad})</p>
+                        </div>
+                    `;
+                    container.appendChild(item);
+                });
+            } catch (err) {
+                console.error(err);
+                container.innerHTML = '<p class="text-red-500 text-sm">Error al cargar las sesiones.</p>';
+            }
+        }
+
+        cargarProximasSesiones();
     });
 </script>
 
