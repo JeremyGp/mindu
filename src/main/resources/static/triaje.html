@@ -149,7 +149,7 @@
                 </div>
             </div>
 
-            <div class="flex-grow p-8 overflow-y-auto space-y-6">
+            <div id="chatMensajes" class="flex-grow p-8 overflow-y-auto space-y-6">
                 
                 <div class="flex gap-4 max-w-3xl">
                     <div class="w-8 h-8 bg-surface border border-surface-container rounded-full flex items-center justify-center flex-shrink-0">
@@ -224,8 +224,11 @@
             <div class="p-6 bg-white border-t border-surface-container">
                 <div class="max-w-4xl mx-auto relative flex items-center bg-surface rounded-xl border border-surface-container px-4 py-1 focus-within:ring-1 focus-within:ring-primary">
                     <span class="material-symbols-outlined text-secondary cursor-pointer hover:text-primary">attach_file</span>
-                    <input type="text" placeholder="Escribe tu respuesta..." class="w-full bg-transparent border-none py-3 px-3 text-body-sm focus:ring-0 outline-none text-primary"/>
-                    <button class="w-10 h-10 bg-primary text-white rounded-lg flex items-center justify-center hover:opacity-95 transition-all active:scale-95">
+                    <input id="mensajeTriaje" type="text" placeholder="Escribe tu respuesta..." class="w-full bg-transparent border-none py-3 px-3 text-body-sm focus:ring-0 outline-none text-primary"/>
+                    <button id="botonVozTriaje" type="button" title="Grabar voz" class="w-10 h-10 mr-2 bg-white border border-surface-container text-primary rounded-lg flex items-center justify-center hover:bg-surface-container transition-all active:scale-95">
+                        <span class="material-symbols-outlined text-[18px]">mic</span>
+                    </button>
+                    <button id="botonEnviarTriaje" type="button" class="w-10 h-10 bg-primary text-white rounded-lg flex items-center justify-center hover:opacity-95 transition-all active:scale-95">
                         <span class="material-symbols-outlined text-[18px]">send</span>
                     </button>
                 </div>
@@ -264,5 +267,6 @@
         });
     });
 </script>
+<script src="js/triaje.js"></script>
 </body>
 </html>

@@ -159,6 +159,45 @@
                         </div>
                     </div>
 
+                    <!-- Chequeo emocional rápido (HU007) — se usa antes/después de las tareas TCC -->
+                    <div class="bg-white border border-surface-container-highest p-stack-md rounded-lg">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-headline-md text-[18px] text-primary flex items-center gap-2">
+                                <span class="material-symbols-outlined text-[20px]">mood</span> Chequeo Emocional Rápido
+                            </h3>
+                            <a href="habitos.html" class="text-[11px] font-bold text-secondary hover:text-primary uppercase tracking-wider">Ver evolución →</a>
+                        </div>
+                        <p class="text-[13px] text-secondary mb-4">Antes o después de un ejercicio TCC, registra cómo te sientes. Esto alimenta tu seguimiento emocional.</p>
+
+                        <div id="selectorEstadoAnimoTareas" class="grid grid-cols-5 gap-2 mb-4 max-w-md">
+                            <button type="button" data-estado="MUY_MAL" class="btn-estado-animo-t flex flex-col items-center gap-1 p-2 border border-surface-container rounded-lg hover:bg-surface-container-low transition-colors">
+                                <span class="text-[22px]">😞</span>
+                                <span class="text-[9px] font-bold text-secondary uppercase">Muy mal</span>
+                            </button>
+                            <button type="button" data-estado="MAL" class="btn-estado-animo-t flex flex-col items-center gap-1 p-2 border border-surface-container rounded-lg hover:bg-surface-container-low transition-colors">
+                                <span class="text-[22px]">🙁</span>
+                                <span class="text-[9px] font-bold text-secondary uppercase">Mal</span>
+                            </button>
+                            <button type="button" data-estado="NEUTRAL" class="btn-estado-animo-t flex flex-col items-center gap-1 p-2 border border-surface-container rounded-lg hover:bg-surface-container-low transition-colors">
+                                <span class="text-[22px]">😐</span>
+                                <span class="text-[9px] font-bold text-secondary uppercase">Neutral</span>
+                            </button>
+                            <button type="button" data-estado="BIEN" class="btn-estado-animo-t flex flex-col items-center gap-1 p-2 border border-surface-container rounded-lg hover:bg-surface-container-low transition-colors">
+                                <span class="text-[22px]">🙂</span>
+                                <span class="text-[9px] font-bold text-secondary uppercase">Bien</span>
+                            </button>
+                            <button type="button" data-estado="MUY_BIEN" class="btn-estado-animo-t flex flex-col items-center gap-1 p-2 border border-surface-container rounded-lg hover:bg-surface-container-low transition-colors">
+                                <span class="text-[22px]">😄</span>
+                                <span class="text-[9px] font-bold text-secondary uppercase">Muy bien</span>
+                            </button>
+                        </div>
+
+                        <button id="botonGuardarEstadoAnimoTareas" class="bg-black text-white font-button-text text-button-text py-2.5 px-6 rounded transition-opacity hover:opacity-90 uppercase tracking-wider text-[12px]">
+                            Guardar chequeo
+                        </button>
+                        <p id="mensajeEstadoAnimoTareas" class="text-[12px] text-secondary mt-2"></p>
+                    </div>
+
                     <div class="bg-white border border-surface-container-highest p-stack-md rounded-lg">
                         <div class="flex justify-between items-center mb-6">
                             <h3 class="font-headline-md text-[18px] text-primary">Adherencia Semanal</h3>
@@ -218,21 +257,21 @@
                                     <span class="material-symbols-outlined text-white/70">bedtime</span>
                                     <span class="text-body-sm">Calidad del Sueño</span>
                                 </div>
-                                <button class="text-[10px] font-bold border border-white/30 px-3 py-1 rounded hover:bg-white/10 transition-colors uppercase tracking-wider">Registrar</button>
+                                <a href="habitos.html" class="text-[10px] font-bold border border-white/30 px-3 py-1 rounded hover:bg-white/10 transition-colors uppercase tracking-wider">Registrar</a>
                             </div>
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center gap-3">
                                     <span class="material-symbols-outlined text-white/70">restaurant</span>
                                     <span class="text-body-sm">Enfoque Nutricional</span>
                                 </div>
-                                <button class="text-[10px] font-bold border border-white/30 px-3 py-1 rounded hover:bg-white/10 transition-colors uppercase tracking-wider">Registrar</button>
+                                <a href="habitos.html" class="text-[10px] font-bold border border-white/30 px-3 py-1 rounded hover:bg-white/10 transition-colors uppercase tracking-wider">Registrar</a>
                             </div>
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center gap-3">
                                     <span class="material-symbols-outlined text-white/70">directions_run</span>
                                     <span class="text-body-sm">Actividad Diaria</span>
                                 </div>
-                                <button class="text-[10px] font-bold border border-white/30 px-3 py-1 rounded hover:bg-white/10 transition-colors uppercase tracking-wider">Registrar</button>
+                                <a href="habitos.html" class="text-[10px] font-bold border border-white/30 px-3 py-1 rounded hover:bg-white/10 transition-colors uppercase tracking-wider">Registrar</a>
                             </div>
                         </div>
 
@@ -246,6 +285,15 @@
                             <div class="w-full bg-white/10 rounded-full h-1.5 mt-3">
                                 <div class="bg-white h-1.5 rounded-full" style="width: 65%"></div>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- Recomendación personalizada (HU009), generada a partir de los registros emocionales -->
+                    <div class="bg-white border border-surface-container-highest p-stack-md rounded-lg">
+                        <h4 class="text-body-sm font-bold text-primary mb-4">Recomendación para ti</h4>
+                        <div id="recomendacionTareas" class="relative pl-6 py-2">
+                            <div class="absolute left-0 top-0 bottom-0 w-1 bg-surface-container rounded-full"></div>
+                            <p class="text-[14px] text-secondary italic leading-relaxed">Cargando recomendación...</p>
                         </div>
                     </div>
 
@@ -273,30 +321,111 @@
 </div>
 
 <script>
+
+    const token = sessionStorage.getItem('token');
+    if (!token) {
+        window.location.href = 'login.html';
+    }
+
+    let estadoAnimoSeleccionadoTareas = null;
+    
     document.addEventListener('DOMContentLoaded', () => {
         const botonPerfil = document.getElementById('botonPerfil');
         const menuDesplegable = document.getElementById('menuDesplegable');
         const botonCerrarSesion = document.getElementById('botonCerrarSesion');
 
-        // Alternar visualización del menú al hacer clic en el avatar
         botonPerfil.addEventListener('click', (e) => {
             e.stopPropagation();
             menuDesplegable.classList.toggle('hidden');
         });
 
-        // Ocultar menú al hacer clic en cualquier otra parte de la pantalla
         document.addEventListener('click', () => {
             if (!menuDesplegable.classList.contains('hidden')) {
                 menuDesplegable.classList.add('hidden');
             }
         });
 
-        // Redirección lógica para simular cierre de sesión hacia login.html
         botonCerrarSesion.addEventListener('click', (e) => {
             e.preventDefault();
             window.location.href = 'login.html';
         });
+
+        inicializarChequeoEmocional();
+        cargarRecomendacionTareas();
     });
+
+    function inicializarChequeoEmocional() {
+        document.querySelectorAll('.btn-estado-animo-t').forEach(boton => {
+            boton.addEventListener('click', () => {
+                document.querySelectorAll('.btn-estado-animo-t').forEach(b => b.classList.remove('seleccionado'));
+                boton.classList.add('seleccionado');
+                estadoAnimoSeleccionadoTareas = boton.dataset.estado;
+            });
+        });
+
+        document.getElementById('botonGuardarEstadoAnimoTareas').addEventListener('click', registrarChequeoEmocional);
+    }
+
+    async function registrarChequeoEmocional() {
+        const mensajeEl = document.getElementById('mensajeEstadoAnimoTareas');
+
+        if (!estadoAnimoSeleccionadoTareas) {
+            mensajeEl.textContent = 'Selecciona un estado de ánimo antes de guardar.';
+            mensajeEl.className = 'text-[12px] text-error mt-2';
+            return;
+        }
+
+        try {
+            const resp = await fetch('/api/emociones', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+                },
+                body: JSON.stringify({
+                    estadoAnimo: estadoAnimoSeleccionadoTareas,
+                    notas: 'Chequeo asociado a una tarea TCC'
+                })
+            });
+
+            if (!resp.ok) {
+                const error = await resp.json();
+                mensajeEl.textContent = error.error || 'No se pudo guardar el chequeo.';
+                mensajeEl.className = 'text-[12px] text-error mt-2';
+                return;
+            }
+
+            mensajeEl.textContent = 'Chequeo guardado. Puedes verlo en tu evolución emocional.';
+            mensajeEl.className = 'text-[12px] text-primary mt-2 font-medium';
+            cargarRecomendacionTareas();
+        } catch (err) {
+            console.error('Error al registrar el chequeo emocional:', err);
+            mensajeEl.textContent = 'Error de conexión con el servidor.';
+            mensajeEl.className = 'text-[12px] text-error mt-2';
+        }
+    }
+
+    async function cargarRecomendacionTareas() {
+        const contenedor = document.getElementById('recomendacionTareas');
+        try {
+            const resp = await fetch('/api/emociones/recomendaciones', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+            if (!resp.ok) throw new Error('No se pudo obtener la recomendación');
+            const data = await resp.json();
+
+            if (!data.recomendaciones || data.recomendaciones.length === 0) {
+                contenedor.innerHTML = '<p class="text-[14px] text-secondary italic leading-relaxed">Aún no hay recomendaciones disponibles.</p>';
+                return;
+            }
+
+            const principal = data.recomendaciones[0];
+            contenedor.innerHTML = `<p class="text-[14px] text-secondary italic leading-relaxed">"${principal.mensaje}"</p>`;
+        } catch (err) {
+            console.error('Error al cargar la recomendación:', err);
+            contenedor.innerHTML = '<p class="text-[14px] text-secondary italic leading-relaxed">No se pudo cargar tu recomendación.</p>';
+        }
+    }
 </script>
 </body>
 </html>

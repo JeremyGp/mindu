@@ -103,16 +103,17 @@
                     <p class="text-body-sm text-secondary">Registra tus patrones diarios para identificar cómo afectan tu bienestar emocional. La consistencia es clave para el equilibrio.</p>
                 </div>
 
-                <div class="mb-gutter flex items-start gap-4 p-5 bg-surface-container-low border border-surface-container rounded-lg">
+                <div id="bannerAlerta" class="mb-gutter hidden items-start gap-4 p-5 bg-surface-container-low border border-surface-container rounded-lg">
                     <span class="material-symbols-outlined text-primary mt-0.5">info</span>
                     <div>
-                        <h4 class="text-body-sm font-bold text-primary uppercase tracking-wider text-[11px] mb-0.5">ALERTA PREVENTIVA</h4>
-                        <p class="text-[13px] text-secondary leading-relaxed">Has dormido menos de 6 horas los últimos 3 días, intenta descansar hoy. El sueño adecuado es fundamental para la regulación emocional.</p>
+                        <h4 id="bannerAlertaTitulo" class="text-body-sm font-bold text-primary uppercase tracking-wider text-[11px] mb-0.5">ALERTA PREVENTIVA</h4>
+                        <p id="bannerAlertaTexto" class="text-[13px] text-secondary leading-relaxed"></p>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-12 gap-gutter">
 
+                    <!-- Calidad del Sueño — conectado a PUT/GET /api/habitos/hoy -->
                     <div class="col-span-12 lg:col-span-8 bg-white border border-surface-container-highest p-stack-md rounded-lg flex flex-col justify-between">
                         <div>
                             <div class="flex justify-between items-center mb-6">
@@ -125,81 +126,97 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                                 <div>
                                     <label class="block text-[11px] font-bold text-secondary uppercase mb-2">Horas Dormidas</label>
-                                    <input type="text" value="5.5" class="w-full bg-surface-container-low border border-surface-container rounded p-3 text-body-sm text-primary font-medium focus:ring-1 focus:ring-primary outline-none" />
+                                    <input id="inputHorasSueno" type="number" step="0.5" min="0" max="24" placeholder="Ej: 7.5" class="w-full bg-surface-container-low border border-surface-container rounded p-3 text-body-sm text-primary font-medium focus:ring-1 focus:ring-primary outline-none" />
                                 </div>
                                 <div>
                                     <label class="block text-[11px] font-bold text-secondary uppercase mb-2">Calidad</label>
                                     <div class="relative">
-                                        <select class="w-full bg-surface-container-low border border-surface-container rounded p-3 text-body-sm text-primary font-medium focus:ring-1 focus:ring-primary outline-none appearance-none cursor-pointer">
-                                            <option value="baja" selected>Baja</option>
-                                            <option value="media">Media</option>
-                                            <option value="alta">Alta</option>
+                                        <select id="selectCalidadSueno" class="w-full bg-surface-container-low border border-surface-container rounded p-3 text-body-sm text-primary font-medium focus:ring-1 focus:ring-primary outline-none appearance-none cursor-pointer">
+                                            <option value="">Selecciona...</option>
+                                            <option value="BAJA">Baja</option>
+                                            <option value="MEDIA">Media</option>
+                                            <option value="ALTA">Alta</option>
                                         </select>
                                         <span class="material-symbols-outlined absolute right-3 top-3.5 text-secondary pointer-events-none text-[18px]">keyboard_arrow_down</span>
                                     </div>
                                 </div>
                             </div>
 
+                            <button id="botonGuardarSueno" class="mb-6 bg-surface-container hover:bg-surface-container-high text-primary font-button-text text-button-text py-2.5 px-5 rounded transition-colors uppercase tracking-wider text-[12px]">
+                                Guardar sueño
+                            </button>
+                            <p id="mensajeSueno" class="text-[12px] text-secondary -mt-4 mb-4"></p>
+
                             <div>
                                 <label class="block text-[11px] font-bold text-secondary uppercase mb-3">Progreso Semanal</label>
-                                <div class="flex gap-2">
-                                    <div class="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center text-[11px] font-bold">L</div>
-                                    <div class="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center text-[11px] font-bold">M</div>
-                                    <div class="w-8 h-8 rounded-full bg-surface-container border border-surface-container-highest text-secondary flex items-center justify-center text-[11px]">X</div>
-                                    <div class="w-8 h-8 rounded-full bg-surface-container border border-surface-container-highest text-secondary flex items-center justify-center text-[11px]">J</div>
-                                    <div class="w-8 h-8 rounded-full bg-surface-container border border-surface-container-highest text-secondary flex items-center justify-center text-[11px]">V</div>
-                                    <div class="w-8 h-8 rounded-full bg-surface-container border border-surface-container-highest text-secondary flex items-center justify-center text-[11px]">S</div>
-                                    <div class="w-8 h-8 rounded-full bg-surface-container border border-surface-container-highest text-secondary flex items-center justify-center text-[11px]">D</div>
+                                <div id="progresoSemanal" class="flex gap-2">
+                                    <div class="w-8 h-8 rounded-full bg-surface-container animate-pulse"></div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
+                    <!-- Estado emocional del día (HU007) -->
                     <div class="col-span-12 lg:col-span-4 bg-white border border-surface-container-highest p-stack-md rounded-lg">
                         <h3 class="font-headline-md text-[18px] text-primary flex items-center gap-2 mb-2">
-                            <span class="material-symbols-outlined text-[20px]">battery_charging_full</span> Energía
+                            <span class="material-symbols-outlined text-[20px]">mood</span> Estado Emocional
                         </h3>
-                        <p class="text-[13px] text-secondary mb-6">¿Cómo te sientes en este momento?</p>
+                        <p class="text-[13px] text-secondary mb-4">¿Cómo te sientes hoy?</p>
 
-                        <div class="space-y-3">
-                            <label class="flex justify-between items-center p-4 border border-surface-container rounded-lg cursor-pointer hover:bg-surface-container-low transition-colors">
-                                <span class="text-body-sm font-medium text-primary">Alto</span>
-                                <input type="radio" name="energia_status" class="w-4 h-4 text-primary focus:ring-primary border-surface-container-highest" />
-                            </label>
-                            <label class="flex justify-between items-center p-4 border border-surface-container rounded-lg cursor-pointer hover:bg-surface-container-low transition-colors">
-                                <span class="text-body-sm font-medium text-primary">Medio</span>
-                                <input type="radio" name="energia_status" class="w-4 h-4 text-primary focus:ring-primary border-surface-container-highest" />
-                            </label>
-                            <label class="flex justify-between items-center p-4 border-2 border-primary rounded-lg bg-surface-container-low/30 cursor-pointer">
-                                <span class="text-body-sm font-bold text-primary">Bajo</span>
-                                <div class="w-4 h-4 rounded-full bg-primary flex items-center justify-center">
-                                    <div class="w-1.5 h-1.5 bg-white rounded-full"></div>
-                                </div>
-                            </label>
+                        <div id="selectorEstadoAnimo" class="grid grid-cols-5 gap-1.5 mb-4">
+                            <button type="button" data-estado="MUY_MAL" class="btn-estado-animo flex flex-col items-center gap-1 p-2 border border-surface-container rounded-lg hover:bg-surface-container-low transition-colors">
+                                <span class="text-[22px]">😞</span>
+                                <span class="text-[9px] font-bold text-secondary uppercase">Muy mal</span>
+                            </button>
+                            <button type="button" data-estado="MAL" class="btn-estado-animo flex flex-col items-center gap-1 p-2 border border-surface-container rounded-lg hover:bg-surface-container-low transition-colors">
+                                <span class="text-[22px]">🙁</span>
+                                <span class="text-[9px] font-bold text-secondary uppercase">Mal</span>
+                            </button>
+                            <button type="button" data-estado="NEUTRAL" class="btn-estado-animo flex flex-col items-center gap-1 p-2 border border-surface-container rounded-lg hover:bg-surface-container-low transition-colors">
+                                <span class="text-[22px]">😐</span>
+                                <span class="text-[9px] font-bold text-secondary uppercase">Neutral</span>
+                            </button>
+                            <button type="button" data-estado="BIEN" class="btn-estado-animo flex flex-col items-center gap-1 p-2 border border-surface-container rounded-lg hover:bg-surface-container-low transition-colors">
+                                <span class="text-[22px]">🙂</span>
+                                <span class="text-[9px] font-bold text-secondary uppercase">Bien</span>
+                            </button>
+                            <button type="button" data-estado="MUY_BIEN" class="btn-estado-animo flex flex-col items-center gap-1 p-2 border border-surface-container rounded-lg hover:bg-surface-container-low transition-colors">
+                                <span class="text-[22px]">😄</span>
+                                <span class="text-[9px] font-bold text-secondary uppercase">Muy bien</span>
+                            </button>
                         </div>
+
+                        <textarea id="notasEstadoAnimo" maxlength="500" rows="2" placeholder="¿Algo que quieras anotar? (opcional)" class="w-full bg-surface-container-low border border-surface-container rounded p-2.5 text-[13px] text-primary focus:ring-1 focus:ring-primary outline-none resize-none mb-3"></textarea>
+
+                        <button id="botonGuardarEstadoAnimo" class="w-full bg-black text-white font-button-text text-button-text py-2.5 rounded transition-opacity hover:opacity-90 uppercase tracking-wider text-[12px]">
+                            Guardar registro
+                        </button>
+                        <p id="mensajeEstadoAnimo" class="text-[12px] text-secondary mt-2 text-center"></p>
                     </div>
 
+                    <!-- Actividad Diaria — conectado a PUT/GET /api/habitos/hoy -->
                     <div class="col-span-12 lg:col-span-6 bg-white border border-surface-container-highest p-stack-md rounded-lg flex flex-col justify-between min-h-[220px]">
                         <div>
                             <h3 class="font-headline-md text-[18px] text-primary flex items-center gap-2 mb-4">
                                 <span class="material-symbols-outlined text-[20px]">directions_run</span> Actividad Diaria
                             </h3>
                             <div class="mb-4">
-                                <span class="text-headline-lg font-bold text-primary text-[32px]">4,230</span>
-                                <span class="text-body-sm text-secondary"> / 8,000 PASOS</span>
+                                <span id="textoPasosActuales" class="text-headline-lg font-bold text-primary text-[32px]">0</span>
+                                <span id="textoMetaPasos" class="text-body-sm text-secondary"> / 8,000 PASOS</span>
                             </div>
 
                             <div class="w-full bg-surface-container rounded-full h-2.5 mb-2">
-                                <div class="bg-black h-2.5 rounded-full" style="width: 53%"></div>
+                                <div id="barraProgresoPasos" class="bg-black h-2.5 rounded-full transition-all" style="width: 0%"></div>
                             </div>
                         </div>
                         <div class="pt-4">
-                            <button class="w-full bg-surface-container hover:bg-surface-container-high text-primary font-button-text text-button-text py-3 rounded transition-colors uppercase tracking-wider text-[12px]">
+                            <button id="botonRegistrarEjercicio" class="w-full bg-surface-container hover:bg-surface-container-high text-primary font-button-text text-button-text py-3 rounded transition-colors uppercase tracking-wider text-[12px]">
                                 Registrar Ejercicio Adicional
                             </button>
                         </div>
                     </div>
 
+                    <!-- Enfoque Nutricional (comidas + hidratación) — conectado a PUT/GET /api/habitos/hoy -->
                     <div class="col-span-12 lg:col-span-6 bg-white border border-surface-container-highest p-stack-md rounded-lg flex flex-col justify-between min-h-[220px]">
                         <div>
                             <h3 class="font-headline-md text-[18px] text-primary flex items-center gap-2 mb-6">
@@ -210,31 +227,53 @@
                                 <div class="space-y-3">
                                     <span class="block text-[10px] font-bold text-secondary uppercase tracking-wider mb-1">Comidas</span>
                                     <label class="flex items-center gap-3 cursor-pointer">
-                                        <input type="checkbox" checked class="rounded text-primary focus:ring-primary border-surface-container-highest w-4 h-4" />
+                                        <input id="checkDesayuno" type="checkbox" class="rounded text-primary focus:ring-primary border-surface-container-highest w-4 h-4" />
                                         <span class="text-body-sm text-primary">Desayuno</span>
                                     </label>
                                     <label class="flex items-center gap-3 cursor-pointer">
-                                        <input type="checkbox" checked class="rounded text-primary focus:ring-primary border-surface-container-highest w-4 h-4" />
+                                        <input id="checkAlmuerzo" type="checkbox" class="rounded text-primary focus:ring-primary border-surface-container-highest w-4 h-4" />
                                         <span class="text-body-sm text-primary">Almuerzo</span>
                                     </label>
                                     <label class="flex items-center gap-3 cursor-pointer">
-                                        <input type="checkbox" class="rounded text-primary focus:ring-primary border-surface-container-highest w-4 h-4" />
+                                        <input id="checkCena" type="checkbox" class="rounded text-primary focus:ring-primary border-surface-container-highest w-4 h-4" />
                                         <span class="text-body-sm text-secondary">Cena</span>
                                     </label>
                                 </div>
 
                                 <div class="space-y-2">
                                     <span class="block text-[10px] font-bold text-secondary uppercase tracking-wider mb-1">Hidratación</span>
-                                    <div class="flex gap-1.5 text-primary">
-                                        <span class="material-symbols-outlined style-fill text-[22px]">water_drop</span>
-                                        <span class="material-symbols-outlined style-fill text-[22px]">water_drop</span>
-                                        <span class="material-symbols-outlined style-fill text-[22px]">water_drop</span>
-                                        <span class="material-symbols-outlined text-surface-container-highest text-[22px]">water_drop</span>
-                                        <span class="material-symbols-outlined text-surface-container-highest text-[22px]">water_drop</span>
+                                    <div id="contenedorVasos" class="flex gap-1.5 text-primary flex-wrap max-w-[140px]"></div>
+                                    <p id="textoVasos" class="text-[12px] text-secondary pt-1">0 de 8 vasos</p>
+                                    <div class="flex gap-2 pt-1">
+                                        <button id="botonMenosVaso" class="w-7 h-7 rounded-full border border-surface-container-highest text-primary text-[14px] font-bold hover:bg-surface-container-low">−</button>
+                                        <button id="botonMasVaso" class="w-7 h-7 rounded-full border border-surface-container-highest text-primary text-[14px] font-bold hover:bg-surface-container-low">+</button>
                                     </div>
-                                    <p class="text-[12px] text-secondary pt-1">3 de 8 vasos</p>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- Evolución emocional (HU008) -->
+                    <div class="col-span-12 lg:col-span-8 bg-white border border-surface-container-highest p-stack-md rounded-lg">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="font-headline-md text-[18px] text-primary flex items-center gap-2">
+                                <span class="material-symbols-outlined text-[20px]">show_chart</span> Evolución Emocional
+                            </h3>
+                            <span id="tendenciaEmocional" class="text-[10px] font-bold text-secondary bg-surface-container px-2 py-0.5 rounded uppercase">ÚLTIMOS 14 DÍAS</span>
+                        </div>
+                        <div id="graficoEvolucion" class="flex items-end justify-between h-32 px-2 gap-1">
+                            <p class="text-[13px] text-secondary">Cargando evolución...</p>
+                        </div>
+                        <p id="promedioEmocional" class="text-[12px] text-secondary mt-4"></p>
+                    </div>
+
+                    <!-- Recomendaciones personalizadas (HU009) -->
+                    <div class="col-span-12 lg:col-span-4 bg-black text-white p-stack-md rounded-lg">
+                        <h3 class="font-headline-md text-[18px] flex items-center gap-2 mb-4">
+                            <span class="material-symbols-outlined text-[20px]">tips_and_updates</span> Recomendaciones para ti
+                        </h3>
+                        <div id="listaRecomendaciones" class="space-y-3">
+                            <p class="text-[13px] text-white/70">Cargando recomendaciones...</p>
                         </div>
                     </div>
 
@@ -247,33 +286,409 @@
         .style-fill {
             font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
+        .btn-estado-animo.seleccionado {
+            border-color: black;
+            border-width: 2px;
+            background-color: #f4f4f5;
+        }
+        .circulo-dia-registrado {
+            background-color: black;
+            color: white;
+        }
+        .circulo-dia-pendiente {
+            background-color: var(--color-surface-container, #f0f0f0);
+            color: #71717a;
+            border: 1px solid var(--color-surface-container-highest, #e4e4e7);
+        }
+        .circulo-dia-hoy {
+            box-shadow: 0 0 0 2px black;
+        }
     </style>
 
     <script>
+
+        const token = sessionStorage.getItem('token');
+        if (!token) {
+            window.location.href = 'login.html';
+        }
+
+        let estadoAnimoSeleccionado = null;
+        const METAS_PASOS_DEFECTO = 8000;
+        let pasosActuales = 0;
+        let metaPasosActual = METAS_PASOS_DEFECTO;
+        let vasosActuales = 0;
+        const MAX_VASOS = 8;
+        
         document.addEventListener('DOMContentLoaded', () => {
             const botonPerfil = document.getElementById('botonPerfil');
             const menuDesplegable = document.getElementById('menuDesplegable');
             const botonCerrarSesion = document.getElementById('botonCerrarSesion');
 
-            // Alternar la visibilidad del menú al hacer clic en el avatar
             botonPerfil.addEventListener('click', (e) => {
-                e.stopPropagation(); // Evita que el evento cierre el menú inmediatamente
+                e.stopPropagation();
                 menuDesplegable.classList.toggle('hidden');
             });
 
-            // Cerrar el menú si se hace clic en cualquier otra parte de la pantalla
             document.addEventListener('click', (e) => {
                 if (!menuDesplegable.classList.contains('hidden')) {
                     menuDesplegable.classList.add('hidden');
                 }
             });
 
-            // Evento para simular el cierre de sesión y redirigir a login.html
             botonCerrarSesion.addEventListener('click', (e) => {
                 e.preventDefault();
                 window.location.href = 'login.html';
             });
+
+            inicializarSelectorEstadoAnimo();
+            inicializarWidgetsHabitos();
+            cargarRegistroDeHoy();
+            cargarEvolucionEmocional();
+            cargarRecomendaciones();
+            cargarHabitosDeHoy();
+            cargarProgresoSemanal();
         });
+
+        // ---------- ESTADO EMOCIONAL (HU007 / HU008 / HU009) ----------
+
+        function inicializarSelectorEstadoAnimo() {
+            document.querySelectorAll('.btn-estado-animo').forEach(boton => {
+                boton.addEventListener('click', () => {
+                    document.querySelectorAll('.btn-estado-animo').forEach(b => b.classList.remove('seleccionado'));
+                    boton.classList.add('seleccionado');
+                    estadoAnimoSeleccionado = boton.dataset.estado;
+                });
+            });
+
+            document.getElementById('botonGuardarEstadoAnimo').addEventListener('click', registrarEstadoEmocional);
+        }
+
+        async function cargarRegistroDeHoy() {
+            try {
+                const resp = await fetch('/api/emociones/hoy', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (!resp.ok) return;
+                const data = await resp.json();
+                if (data.registro) {
+                    estadoAnimoSeleccionado = data.registro.estadoAnimo;
+                    document.querySelectorAll('.btn-estado-animo').forEach(b => {
+                        b.classList.toggle('seleccionado', b.dataset.estado === estadoAnimoSeleccionado);
+                    });
+                    document.getElementById('notasEstadoAnimo').value = data.registro.notas || '';
+                    document.getElementById('mensajeEstadoAnimo').textContent = 'Ya registraste tu estado de hoy. Puedes actualizarlo si cambió.';
+                }
+            } catch (err) {
+                console.error('Error al cargar el registro de hoy:', err);
+            }
+        }
+
+        async function registrarEstadoEmocional() {
+            const mensajeEl = document.getElementById('mensajeEstadoAnimo');
+
+            if (!estadoAnimoSeleccionado) {
+                mensajeEl.textContent = 'Selecciona un estado de ánimo antes de guardar.';
+                mensajeEl.className = 'text-[12px] text-error mt-2 text-center';
+                return;
+            }
+
+            try {
+                const resp = await fetch('/api/emociones', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify({
+                        estadoAnimo: estadoAnimoSeleccionado,
+                        notas: document.getElementById('notasEstadoAnimo').value
+                    })
+                });
+
+                if (!resp.ok) {
+                    const error = await resp.json();
+                    mensajeEl.textContent = error.error || 'No se pudo guardar el registro.';
+                    mensajeEl.className = 'text-[12px] text-error mt-2 text-center';
+                    return;
+                }
+
+                mensajeEl.textContent = 'Registro guardado. ¡Gracias por compartir cómo te sientes!';
+                mensajeEl.className = 'text-[12px] text-primary mt-2 text-center font-medium';
+
+                cargarEvolucionEmocional();
+                cargarRecomendaciones();
+            } catch (err) {
+                console.error('Error al registrar el estado emocional:', err);
+                mensajeEl.textContent = 'Error de conexión con el servidor.';
+                mensajeEl.className = 'text-[12px] text-error mt-2 text-center';
+            }
+        }
+
+        async function cargarEvolucionEmocional() {
+            const contenedor = document.getElementById('graficoEvolucion');
+            const promedioEl = document.getElementById('promedioEmocional');
+            const tendenciaEl = document.getElementById('tendenciaEmocional');
+
+            try {
+                const resp = await fetch('/api/emociones/evolucion?dias=14', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (!resp.ok) throw new Error('No se pudo obtener la evolución emocional');
+                const data = await resp.json();
+
+                if (!data.registros || data.registros.length === 0) {
+                    contenedor.innerHTML = '<p class="text-[13px] text-secondary">Aún no tienes registros. ¡Registra tu primer estado emocional!</p>';
+                    promedioEl.textContent = '';
+                    return;
+                }
+
+                contenedor.innerHTML = '';
+                data.registros.forEach(registro => {
+                    const alturaPx = Math.max((registro.valorNumerico / 5) * 100, 8);
+                    const dia = new Date(registro.fecha + 'T00:00:00').toLocaleDateString('es-PE', { weekday: 'short' }).toUpperCase();
+
+                    const columna = document.createElement('div');
+                    columna.className = 'flex flex-col items-center gap-2 flex-1';
+                    columna.innerHTML = `
+                        <div class="w-full flex items-end h-24">
+                            <div class="w-full bg-black rounded-t" style="height: ${alturaPx}%" title="${registro.estadoAnimoEtiqueta}"></div>
+                        </div>
+                        <span class="text-[9px] font-bold text-secondary uppercase">${dia}</span>
+                    `;
+                    contenedor.appendChild(columna);
+                });
+
+                promedioEl.textContent = `Promedio: ${data.promedio.toFixed(1)} / 5`;
+
+                const etiquetasTendencia = {
+                    MEJORANDO: 'TENDENCIA: MEJORANDO',
+                    EMPEORANDO: 'TENDENCIA: A LA BAJA',
+                    ESTABLE: 'TENDENCIA: ESTABLE'
+                };
+                tendenciaEl.textContent = etiquetasTendencia[data.tendencia] || 'ÚLTIMOS 14 DÍAS';
+            } catch (err) {
+                console.error('Error al cargar la evolución emocional:', err);
+                contenedor.innerHTML = '<p class="text-[13px] text-error">No se pudo cargar tu evolución emocional.</p>';
+            }
+        }
+
+        async function cargarRecomendaciones() {
+            const contenedor = document.getElementById('listaRecomendaciones');
+            const banner = document.getElementById('bannerAlerta');
+            const bannerTexto = document.getElementById('bannerAlertaTexto');
+
+            try {
+                const resp = await fetch('/api/emociones/recomendaciones', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (!resp.ok) throw new Error('No se pudieron obtener recomendaciones');
+                const data = await resp.json();
+
+                contenedor.innerHTML = '';
+                let hayAlerta = false;
+
+                data.recomendaciones.forEach(rec => {
+                    const item = document.createElement('div');
+                    item.className = 'p-3 rounded-lg ' + (rec.nivel === 'ALERTA' ? 'bg-red-500/20 border border-red-400/40' : 'bg-white/10');
+                    item.innerHTML = `
+                        <span class="text-[10px] font-bold uppercase tracking-wider block mb-1 ${rec.nivel === 'ALERTA' ? 'text-red-300' : 'text-white/60'}">${rec.categoria}</span>
+                        <p class="text-[13px] leading-relaxed">${rec.mensaje}</p>
+                    `;
+                    contenedor.appendChild(item);
+
+                    if (rec.nivel === 'ALERTA') {
+                        hayAlerta = true;
+                        bannerTexto.textContent = rec.mensaje;
+                    }
+                });
+
+                banner.classList.toggle('hidden', !hayAlerta);
+                banner.classList.toggle('flex', hayAlerta);
+            } catch (err) {
+                console.error('Error al cargar recomendaciones:', err);
+                contenedor.innerHTML = '<p class="text-[13px] text-white/70">No se pudieron cargar tus recomendaciones.</p>';
+            }
+        }
+
+        // ---------- HÁBITOS: SUEÑO, HIDRATACIÓN, COMIDAS, ACTIVIDAD ----------
+
+        function inicializarWidgetsHabitos() {
+            document.getElementById('botonGuardarSueno').addEventListener('click', guardarSueno);
+
+            document.getElementById('checkDesayuno').addEventListener('change', (e) =>
+                actualizarHabito({ desayuno: e.target.checked }));
+            document.getElementById('checkAlmuerzo').addEventListener('change', (e) =>
+                actualizarHabito({ almuerzo: e.target.checked }));
+            document.getElementById('checkCena').addEventListener('change', (e) =>
+                actualizarHabito({ cena: e.target.checked }));
+
+            document.getElementById('botonMasVaso').addEventListener('click', () => cambiarVasos(1));
+            document.getElementById('botonMenosVaso').addEventListener('click', () => cambiarVasos(-1));
+
+            document.getElementById('botonRegistrarEjercicio').addEventListener('click', registrarEjercicioAdicional);
+        }
+
+        async function cargarHabitosDeHoy() {
+            try {
+                const resp = await fetch('/api/habitos/hoy', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (!resp.ok) throw new Error('No se pudo obtener el registro de hábitos de hoy');
+                const data = await resp.json();
+
+                if (data.horasSueno != null) {
+                    document.getElementById('inputHorasSueno').value = data.horasSueno;
+                }
+                if (data.calidadSueno) {
+                    document.getElementById('selectCalidadSueno').value = data.calidadSueno;
+                }
+
+                document.getElementById('checkDesayuno').checked = !!data.desayuno;
+                document.getElementById('checkAlmuerzo').checked = !!data.almuerzo;
+                document.getElementById('checkCena').checked = !!data.cena;
+
+                vasosActuales = data.vasosAgua || 0;
+                renderizarVasos();
+
+                pasosActuales = data.pasos || 0;
+                metaPasosActual = data.metaPasos || METAS_PASOS_DEFECTO;
+                renderizarPasos();
+            } catch (err) {
+                console.error('Error al cargar hábitos de hoy:', err);
+            }
+        }
+
+        async function actualizarHabito(payloadParcial) {
+            try {
+                const resp = await fetch('/api/habitos/hoy', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify(payloadParcial)
+                });
+
+                if (!resp.ok) {
+                    const error = await resp.json();
+                    console.error('Error al actualizar hábito:', error.error);
+                    return null;
+                }
+
+                cargarProgresoSemanal();
+                return await resp.json();
+            } catch (err) {
+                console.error('Error de conexión al actualizar hábito:', err);
+                return null;
+            }
+        }
+
+        async function guardarSueno() {
+            const mensajeEl = document.getElementById('mensajeSueno');
+            const horas = document.getElementById('inputHorasSueno').value;
+            const calidad = document.getElementById('selectCalidadSueno').value;
+
+            const payload = {};
+            if (horas !== '') payload.horasSueno = parseFloat(horas);
+            if (calidad !== '') payload.calidadSueno = calidad;
+
+            if (Object.keys(payload).length === 0) {
+                mensajeEl.textContent = 'Ingresa al menos las horas o la calidad del sueño.';
+                mensajeEl.className = 'text-[12px] text-error -mt-4 mb-4';
+                return;
+            }
+
+            const resultado = await actualizarHabito(payload);
+            if (resultado) {
+                mensajeEl.textContent = 'Registro de sueño guardado.';
+                mensajeEl.className = 'text-[12px] text-primary -mt-4 mb-4 font-medium';
+            } else {
+                mensajeEl.textContent = 'No se pudo guardar el registro de sueño.';
+                mensajeEl.className = 'text-[12px] text-error -mt-4 mb-4';
+            }
+        }
+
+        function renderizarVasos() {
+            const contenedor = document.getElementById('contenedorVasos');
+            const texto = document.getElementById('textoVasos');
+            contenedor.innerHTML = '';
+
+            for (let i = 0; i < MAX_VASOS; i++) {
+                const lleno = i < vasosActuales;
+                const icono = document.createElement('span');
+                icono.className = 'material-symbols-outlined text-[22px] ' +
+                    (lleno ? 'style-fill text-primary' : 'text-surface-container-highest');
+                icono.textContent = 'water_drop';
+                contenedor.appendChild(icono);
+            }
+
+            texto.textContent = `${vasosActuales} de ${MAX_VASOS} vasos`;
+        }
+
+        async function cambiarVasos(delta) {
+            const nuevoValor = Math.max(0, Math.min(MAX_VASOS, vasosActuales + delta));
+            if (nuevoValor === vasosActuales) return;
+
+            vasosActuales = nuevoValor;
+            renderizarVasos();
+
+            await actualizarHabito({ vasosAgua: vasosActuales });
+        }
+
+        function renderizarPasos() {
+            document.getElementById('textoPasosActuales').textContent = pasosActuales.toLocaleString('es-PE');
+            document.getElementById('textoMetaPasos').textContent = ` / ${metaPasosActual.toLocaleString('es-PE')} PASOS`;
+
+            const porcentaje = Math.min((pasosActuales / metaPasosActual) * 100, 100);
+            document.getElementById('barraProgresoPasos').style.width = porcentaje + '%';
+        }
+
+        async function registrarEjercicioAdicional() {
+            const entrada = window.prompt('¿Cuántos pasos adicionales quieres registrar?', '500');
+            if (entrada === null) return;
+
+            const pasosAdicionales = parseInt(entrada, 10);
+            if (isNaN(pasosAdicionales) || pasosAdicionales <= 0) {
+                alert('Ingresa un número válido de pasos.');
+                return;
+            }
+
+            const nuevoTotal = pasosActuales + pasosAdicionales;
+            const resultado = await actualizarHabito({ pasos: nuevoTotal });
+            if (resultado) {
+                pasosActuales = resultado.pasos;
+                metaPasosActual = resultado.metaPasos;
+                renderizarPasos();
+            }
+        }
+
+        async function cargarProgresoSemanal() {
+            const contenedor = document.getElementById('progresoSemanal');
+            try {
+                const resp = await fetch('/api/habitos/semana', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (!resp.ok) throw new Error('No se pudo obtener el progreso semanal');
+                const data = await resp.json();
+
+                const hoyISO = new Date().toISOString().slice(0, 10);
+                contenedor.innerHTML = '';
+
+                data.dias.forEach(dia => {
+                    const esHoy = dia.fecha === hoyISO;
+                    const circulo = document.createElement('div');
+                    circulo.className = 'w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-bold ' +
+                        (dia.registrado ? 'circulo-dia-registrado' : 'circulo-dia-pendiente') +
+                        (esHoy ? ' circulo-dia-hoy' : '');
+                    circulo.textContent = dia.diaAbreviado;
+                    circulo.title = dia.fecha + (dia.registrado ? ' — registrado' : ' — sin registro');
+                    contenedor.appendChild(circulo);
+                });
+            } catch (err) {
+                console.error('Error al cargar el progreso semanal:', err);
+                contenedor.innerHTML = '<p class="text-[12px] text-error">No se pudo cargar el progreso semanal.</p>';
+            }
+        }
     </script>
 </body>
 
