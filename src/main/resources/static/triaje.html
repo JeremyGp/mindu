@@ -14,6 +14,11 @@
 
 <header class="flex fixed top-0 left-0 right-0 z-50 justify-between items-center px-8 h-16 bg-white border-b border-zinc-200 font-manrope antialiased tracking-tight">
     <div class="flex items-center gap-stack-md">
+        <button id="botonMenuMovil" class="md:hidden p-2 text-zinc-600 hover:bg-zinc-100 rounded-full transition-colors">
+            <span class="material-symbols-outlined">
+                menu
+            </span>
+        </button>
         <span class="text-xl font-extrabold tracking-tighter text-black">MindU</span>
     </div>
     <div class="flex items-center gap-6">
@@ -47,8 +52,7 @@
 </header>
 
 <div class="flex pt-16">
-    <aside class="h-[calc(100vh-64px)] w-64 fixed left-0 top-16 flex flex-col bg-surface border-r border-surface-container py-stack-md z-40">
-        <nav class="flex-grow flex flex-col">
+    <aside id="menuLateral" class="hidden md:flex h-[calc(100vh-64px)] w-64 fixed left-0 top-16 flex-col bg-surface border-r border-surface-container py-stack-md z-40">
             <a class="flex items-center px-margin py-3 text-secondary hover:bg-surface-container-high transition-all active:scale-95 duration-200" href="panelPrincipal.html">
                 <span class="material-symbols-outlined mr-3">dashboard</span>
                 <span class="font-label-caps text-label-caps">Panel Principal</span>
@@ -268,5 +272,6 @@
     });
 </script>
 <script src="js/triaje.js"></script>
+<script src="js/layout.js"></script>
 </body>
 </html>

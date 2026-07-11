@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let mediaRecorder = null;
     let audioChunks = [];
     let grabando = false;
+    let ultimaRespuestaIA = "";
 
     chatMensajes.innerHTML = '';
     agregarMensajeIA('Hola. Soy el asistente de triaje psicologico de MindU. Cuéntame como te has sentido en las ultimas 48 horas.');
@@ -57,8 +58,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const data = await response.json();
             quitarEscribiendo();
-            agregarMensajeIA(data.respuesta || 'No pude generar una respuesta en este momento.');
-            historial.push({ rol: 'assistant', contenido: data.respuesta || '' });
+            const respuesta = data.respuesta || 'No pude generar una respuesta en este momento.';
+            ultimaRespuestaIA = respuesta;
+            agregarMensajeIA(respuesta);
+            historial.push({ rol: 'assistant', contenido: respuesta });
         } catch (error) {
             quitarEscribiendo();
             agregarMensajeIA('Tu mensaje llego al chat, pero hubo un problema al consultar la IA. Revisa el backend o la clave de OpenAI.');
@@ -177,12 +180,26 @@ document.addEventListener('DOMContentLoaded', () => {
         const wrapper = document.createElement('div');
         wrapper.className = 'flex gap-4 max-w-3xl';
         wrapper.innerHTML = `
-            <div class="w-8 h-8 bg-surface border border-surface-container rounded-full flex items-center justify-center flex-shrink-0">
-                <span class="material-symbols-outlined text-secondary text-[18px]">smart_toy</span>
-            </div>
+        <div class="w-8 h-8 bg-surface border border-surface-container rounded-full flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined text-secondary text-[18px]">smart_toy</span>
+        </div>
+
+        <div>
             <div class="bg-white p-4 rounded-xl border border-surface-container text-body-sm text-primary shadow-sm leading-relaxed"></div>
-        `;
+
+            <button class="botonVozRespuesta mt-2 text-sm text-primary">
+                🔊 Escuchar respuesta
+            </button>
+        </div>
+    `;
         wrapper.querySelector('.bg-white').textContent = texto;
+
+        const botonVoz = wrapper.querySelector('.botonVozRespuesta');
+
+        botonVoz.addEventListener('click', () => {
+            leerTexto(texto);
+        });
+
         chatMensajes.appendChild(wrapper);
         scrollAlFinal();
     }
@@ -219,4 +236,24 @@ document.addEventListener('DOMContentLoaded', () => {
     function scrollAlFinal() {
         chatMensajes.scrollTop = chatMensajes.scrollHeight;
     }
+
+    function leerTexto(texto) {
+
+    if ('speechSynthesis' in window) {
+
+        window.speechSynthesis.cancel();
+
+        const voz = new SpeechSynthesisUtterance(texto);
+
+        voz.lang = "es-ES";
+        voz.rate = 1;
+        voz.pitch = 1;
+
+        window.speechSynthesis.speak(voz);
+
+    } else {
+        alert("Tu navegador no soporta lectura de voz");
+    }
+}
+
 });
