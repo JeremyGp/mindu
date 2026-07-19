@@ -7,6 +7,7 @@ import grupo.diseno.mindu.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import grupo.diseno.mindu.model.TipoNotificacion;
 
 import java.util.List;
 
@@ -19,6 +20,7 @@ public class CitaService {
     private final PsicologoRepository psicologoRepository;
     private final UsuarioRepository usuarioRepository;
     private final DisponibilidadRepository disponibilidadRepository;
+    private final NotificacionService notificacionService;
 
     @Transactional
     public CitaResponseDTO agendarCita(AgendarCitaRequest request, String estudianteCorreo) {
@@ -81,6 +83,11 @@ public class CitaService {
                 .build();
 
         Cita savedCita = citaRepository.save(cita);
+        notificacionService.crear(savedCita.getEstudiante(), TipoNotificacion.RECORDATORIO_CITA,
+                "Cita confirmada",
+                "Tu cita con " + savedCita.getPsicologo().getNombre() + " quedó confirmada para el "
+                        + savedCita.getFecha() + " a las " + savedCita.getHora() + ".",
+                savedCita.getId());
         return mapToDTO(savedCita);
     }
 
@@ -150,6 +157,20 @@ public class CitaService {
 
         cita.setEstado(nuevoEstado);
         Cita updatedCita = citaRepository.save(cita);
+
+        if (nuevoEstado == EstadoCita.CONFIRMADA) {
+            notificacionService.crear(updatedCita.getEstudiante(), TipoNotificacion.RECORDATORIO_CITA,
+                    "Cita confirmada",
+                    "Tu psicólogo(a) " + updatedCita.getPsicologo().getNombre() + " confirmó tu cita del "
+                            + updatedCita.getFecha() + " a las " + updatedCita.getHora() + ".",
+                    updatedCita.getId());
+        } else if (nuevoEstado == EstadoCita.CANCELADA) {
+            notificacionService.crear(updatedCita.getEstudiante(), TipoNotificacion.RECORDATORIO_CITA,
+                    "Cita cancelada",
+                    "Tu cita del " + updatedCita.getFecha() + " a las " + updatedCita.getHora() + " fue cancelada.",
+                    updatedCita.getId());
+        }
+
         return mapToDTO(updatedCita);
     }
 

@@ -27,8 +27,8 @@ public class TriajeController {
     private final OpenAIConnector openAIConnector;
 
     @PostMapping("/chat")
-    public ResponseEntity<TriajeChatResponse> chat(@Valid @RequestBody TriajeChatRequest request) {
-        return ResponseEntity.ok(triajeAIService.responder(request));
+    public ResponseEntity<TriajeChatResponse> chat(@Valid @RequestBody TriajeChatRequest request, java.security.Principal principal) {
+        return ResponseEntity.ok(triajeAIService.responder(request, principal.getName()));
     }
 
     @PostMapping(value = "/transcribir", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

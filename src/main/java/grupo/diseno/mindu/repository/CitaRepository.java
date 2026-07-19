@@ -18,6 +18,9 @@ public interface CitaRepository extends JpaRepository<Cita, Long> {
 
     List<Cita> findByPsicologoCorreoOrderByFechaAscHoraAsc(String correo);
 
+    List<Cita> findByEstadoInAndRecordatorioEnviadoFalseAndFechaGreaterThanEqual(
+        List<EstadoCita> estados, LocalDate fecha);
+
     @Query("SELECT COUNT(c) > 0 FROM Cita c WHERE c.psicologo.id = :psicologoId AND c.fecha = :fecha AND c.hora = :hora AND c.estado <> :estadoExcluido")
     boolean existsOverlappingPsicologo(
             @Param("psicologoId") Long psicologoId,

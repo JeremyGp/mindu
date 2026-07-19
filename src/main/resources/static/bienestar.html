@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Bienestar - MindU</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght=400;500;600;700&family=Inter:wght=400;500;600&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="style/style.css">
+
+    <style>
+        @keyframes respirarCirculo {
+            0% { transform: scale(0.7); }
+            50% { transform: scale(1.15); }
+            100% { transform: scale(0.7); }
+        }
+        .circulo-respiracion {
+            animation: respirarCirculo 6s ease-in-out infinite;
+        }
+    </style>
+</head>
+
+<body class="font-body-lg text-on-surface bg-background">
+
+    <header class="flex fixed top-0 left-0 right-0 z-50 justify-between items-center px-8 h-16 bg-white border-b border-zinc-200 font-manrope antialiased tracking-tight">
+        <div class="flex items-center gap-stack-md">
+            <span class="text-xl font-extrabold tracking-tighter text-black">MindU</span>
+        </div>
+        <div class="flex items-center gap-6">
+            <div class="flex items-center gap-4">
+                <a href="notificaciones.html" class="relative p-2 text-zinc-600 hover:bg-zinc-100 rounded-full transition-colors">
+                    <span class="material-symbols-outlined">notifications</span>
+                </a>
+
+                <div class="relative">
+                    <button id="botonPerfil" class="flex items-center focus:outline-none transition-transform active:scale-95">
+                        <div class="h-8 w-8 rounded-full overflow-hidden border border-zinc-200">
+                            <img alt="User profile avatar" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDJu_JVp6Rt2Fd_tSC5SUhGthyIX3cbdTT_3yqUYeuNYt2IEpeUpYwp0gvcU2YbpqWs4nMZute87EXaF2sPngS9M0RNiXt-kdVdqB2wzG3hN5w9mAlRAf0l92AS3qtqJs9V0lRbMvhAk5ewBv3ao0cs5FJ3nS9j-r9KuDTR994SEUfjLHH6syufi-Eowph4RWyOe5VNGKAlMxZNG0VEF1JMZqZJXEOupr3Ku4DW_BNfCW0m1waLfIUfr22vGVSA9nWedP7Q_KO7hgI"/>
+                        </div>
+                    </button>
+
+                    <div id="menuDesplegable" class="hidden absolute right-0 mt-2 w-48 bg-white border border-zinc-200 rounded-lg shadow-lg py-1 z-50 animate-fade-in">
+                        <a href="perfil.html" class="flex items-center px-4 py-2.5 text-sm text-zinc-700 hover:bg-zinc-50 transition-colors">
+                            <span class="material-symbols-outlined mr-2 text-[18px] text-zinc-500">account_circle</span>
+                            Ver perfil
+                        </a>
+                        <hr class="border-zinc-100 my-1">
+                        <button id="botonCerrarSesion" class="w-full flex items-center px-4 py-2.5 text-sm text-error hover:bg-red-50 transition-colors text-left">
+                            <span class="material-symbols-outlined mr-2 text-[18px] text-error">logout</span>
+                            Cerrar sesión
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex pt-16">
+        <aside class="h-[calc(100vh-64px)] w-64 fixed left-0 top-16 flex flex-col bg-surface border-r border-surface-container py-stack-md z-40">
+            <nav class="flex-grow flex flex-col">
+                <a class="flex items-center px-margin py-3 text-secondary hover:bg-surface-container-high transition-all active:scale-95 duration-200" href="panelPrincipal.html">
+                    <span class="material-symbols-outlined mr-3">dashboard</span>
+                    <span class="font-label-caps text-label-caps">Panel Principal</span>
+                </a>
+
+                <a class="flex items-center px-margin py-3 text-secondary hover:bg-surface-container-high transition-all active:scale-95 duration-200" href="citas.html">
+                    <span class="material-symbols-outlined mr-3">calendar_month</span>
+                    <span class="font-label-caps text-label-caps">Citas</span>
+                </a>
+
+                <a class="flex items-center px-margin py-3 text-secondary hover:bg-surface-container-high transition-all active:scale-95 duration-200" href="triaje.html">
+                    <span class="material-symbols-outlined mr-3">psychology</span>
+                    <span class="font-label-caps text-label-caps">Triaje IA</span>
+                </a>
+
+                <a class="flex items-center px-margin py-3 text-secondary hover:bg-surface-container-high transition-all active:scale-95 duration-200" href="tareas.html">
+                    <span class="material-symbols-outlined mr-3">assignment</span>
+                    <span class="font-label-caps text-label-caps">Tareas TCC</span>
+                </a>
+
+                <a class="flex items-center px-margin py-3 text-secondary hover:bg-surface-container-high transition-all active:scale-95 duration-200" href="habitos.html">
+                    <span class="material-symbols-outlined mr-3">event_note</span>
+                    <span class="font-label-caps text-label-caps">Seguimiento de Hábitos</span>
+                </a>
+
+                <a class="flex items-center px-margin py-3 text-secondary hover:bg-surface-container-high transition-all active:scale-95 duration-200 active-tab" href="bienestar.html">
+                    <span class="material-symbols-outlined mr-3">spa</span>
+                    <span class="font-label-caps text-label-caps">Bienestar</span>
+                </a>
+
+                <a class="flex items-center px-margin py-3 text-secondary hover:bg-surface-container-high transition-all active:scale-95 duration-200" href="notificaciones.html">
+                    <span class="material-symbols-outlined mr-3">notifications</span>
+                    <span class="font-label-caps text-label-caps">Notificaciones</span>
+                </a>
+
+                <a class="flex items-center px-margin py-3 text-secondary hover:bg-surface-container-high transition-all active:scale-95 duration-200" href="configuracion.html">
+                    <span class="material-symbols-outlined mr-3">settings</span>
+                    <span class="font-label-caps text-label-caps">Configuración</span>
+                </a>
+            </nav>
+
+            <div class="px-margin mt-auto pt-stack-md space-y-2">
+                <a href="bienestar.html?tab=CRISIS" class="block text-center w-full bg-error text-on-error font-button-text text-button-text py-3 rounded uppercase tracking-wider hover:opacity-90 transition-opacity">
+                    SOS Emergency
+                </a>
+                <div class="pt-4 border-t border-surface-container"></div>
+            </div>
+        </aside>
+
+        <main class="flex-grow ml-64 p-margin min-h-screen">
+            <div class="max-w-[1000px] mx-auto">
+
+                <div class="mb-6 font-manrope">
+                    <h2 class="text-3xl font-bold tracking-tight text-zinc-900 mb-2">Bienestar</h2>
+                    <p class="text-sm text-zinc-500 mb-6">Herramientas rápidas de apoyo emocional cuando las necesites.</p>
+
+                    <div class="flex gap-2 mb-8">
+                        <button data-tab="RESPIRACION" class="btn-tab px-4 py-1.5 rounded-full text-sm font-medium transition-colors">Respiración</button>
+                        <button data-tab="MEDITACION" class="btn-tab px-4 py-1.5 rounded-full text-sm font-medium transition-colors">Meditación</button>
+                        <button data-tab="CRISIS" class="btn-tab px-4 py-1.5 rounded-full text-sm font-medium transition-colors">Ayuda en crisis</button>
+                    </div>
+                </div>
+
+                <div id="contenedor-recursos" class="grid grid-cols-1 sm:grid-cols-2 gap-4 font-inter"></div>
+            </div>
+        </main>
+    </div>
+
+    <div id="modalEjercicio" class="hidden fixed inset-0 bg-black/50 z-[60] flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-8 text-center relative">
+            <button id="botonCerrarModal" class="absolute top-4 right-4 text-zinc-400 hover:text-zinc-700">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+
+            <h3 id="tituloEjercicio" class="text-xl font-bold text-zinc-900 mb-6 font-manrope"></h3>
+
+            <div class="w-32 h-32 mx-auto mb-6 rounded-full bg-primary/10 border-2 border-primary flex items-center justify-center circulo-respiracion">
+                <span class="material-symbols-outlined text-primary text-[40px]">self_improvement</span>
+            </div>
+
+            <p id="pasoEjercicio" class="text-base text-zinc-700 mb-2 min-h-[48px] flex items-center justify-center px-2"></p>
+            <p id="contadorEjercicio" class="text-xs text-zinc-400 mb-6"></p>
+
+            <div id="bloqueFinal" class="hidden space-y-3">
+                <p class="text-sm text-zinc-600">¡Bien hecho! Puedes continuar tu seguimiento emocional.</p>
+                <a href="habitos.html" class="block w-full bg-black text-white py-2.5 rounded-lg text-sm font-semibold">Continuar seguimiento</a>
+            </div>
+
+            <a href="citas.html" class="mt-4 block text-xs text-zinc-400 hover:text-zinc-600 underline">¿Necesitas hablar con alguien? Agenda una cita</a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const botonPerfil = document.getElementById('botonPerfil');
+            const menuDesplegable = document.getElementById('menuDesplegable');
+            const botonCerrarSesion = document.getElementById('botonCerrarSesion');
+            const contenedorRecursos = document.getElementById('contenedor-recursos');
+            const botonesTab = document.querySelectorAll('.btn-tab');
+
+            const modal = document.getElementById('modalEjercicio');
+            const tituloEjercicio = document.getElementById('tituloEjercicio');
+            const pasoEjercicio = document.getElementById('pasoEjercicio');
+            const contadorEjercicio = document.getElementById('contadorEjercicio');
+            const bloqueFinal = document.getElementById('bloqueFinal');
+            const botonCerrarModal = document.getElementById('botonCerrarModal');
+
+            let intervaloActivo = null;
+
+            botonPerfil.addEventListener('click', (e) => {
+                e.stopPropagation();
+                menuDesplegable.classList.toggle('hidden');
+            });
+
+            document.addEventListener('click', () => {
+                if (!menuDesplegable.classList.contains('hidden')) {
+                    menuDesplegable.classList.add('hidden');
+                }
+            });
+
+            botonCerrarSesion.addEventListener('click', (e) => {
+                e.preventDefault();
+                sessionStorage.removeItem('token');
+                window.location.href = 'login.html';
+            });
+
+            const token = sessionStorage.getItem('token');
+            const authHeaders = () => ({ 'Authorization': `Bearer ${token}` });
+
+            function activarTab(tipo) {
+                botonesTab.forEach(b => {
+                    const activo = b.dataset.tab === tipo;
+                    b.classList.toggle('bg-black', activo);
+                    b.classList.toggle('text-white', activo);
+                    b.classList.toggle('bg-zinc-100', !activo);
+                    b.classList.toggle('text-zinc-600', !activo);
+                });
+                cargarRecursos(tipo);
+            }
+
+            async function cargarRecursos(tipo) {
+                contenedorRecursos.innerHTML = `<p class="text-sm text-zinc-500">Cargando...</p>`;
+                const res = await fetch(`/api/bienestar/recursos?tipo=${tipo}`, { headers: authHeaders() });
+                const recursos = await res.json();
+
+                contenedorRecursos.innerHTML = '';
+                if (recursos.length === 0) {
+                    contenedorRecursos.innerHTML = `<p class="text-sm text-zinc-500">No hay recursos disponibles todavía.</p>`;
+                    return;
+                }
+
+                recursos.forEach(r => {
+                    const minutos = Math.floor(r.duracionSegundos / 60);
+                    const segundos = r.duracionSegundos % 60;
+                    const duracionTexto = minutos > 0 ? `${minutos} min ${segundos > 0 ? segundos + 's' : ''}` : `${segundos}s`;
+
+                    const tarjeta = document.createElement('div');
+                    tarjeta.className = "p-5 bg-white border border-zinc-200 rounded-xl hover:shadow-sm transition-shadow";
+                    tarjeta.innerHTML = `
+                        <h4 class="text-sm font-bold text-zinc-900 mb-1">${r.titulo}</h4>
+                        <p class="text-sm text-zinc-600 mb-3">${r.descripcion}</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs text-zinc-400">${duracionTexto}</span>
+                            <button data-id="${r.id}" class="btn-iniciar px-4 py-2 bg-zinc-900 text-white text-sm font-semibold rounded-lg hover:opacity-90">Iniciar</button>
+                        </div>
+                    `;
+                    contenedorRecursos.appendChild(tarjeta);
+                });
+            }
+
+            contenedorRecursos.addEventListener('click', async (e) => {
+                const boton = e.target.closest('.btn-iniciar');
+                if (!boton) return;
+
+                const res = await fetch(`/api/bienestar/recursos/${boton.dataset.id}`, { headers: authHeaders() });
+                const recurso = await res.json();
+                iniciarEjercicio(recurso);
+            });
+
+            function iniciarEjercicio(recurso) {
+                clearInterval(intervaloActivo);
+                bloqueFinal.classList.add('hidden');
+                pasoEjercicio.classList.remove('hidden');
+
+                tituloEjercicio.textContent = recurso.titulo;
+                modal.classList.remove('hidden');
+
+                const pasos = recurso.pasos;
+                const duracionPorPaso = Math.max(Math.round(recurso.duracionSegundos / pasos.length), 3);
+
+                let indice = 0;
+                pasoEjercicio.textContent = pasos[indice];
+                contadorEjercicio.textContent = `Paso ${indice + 1} de ${pasos.length}`;
+
+                intervaloActivo = setInterval(() => {
+                    indice++;
+                    if (indice >= pasos.length) {
+                        clearInterval(intervaloActivo);
+                        pasoEjercicio.classList.add('hidden');
+                        contadorEjercicio.textContent = '';
+                        bloqueFinal.classList.remove('hidden');
+                        return;
+                    }
+                    pasoEjercicio.textContent = pasos[indice];
+                    contadorEjercicio.textContent = `Paso ${indice + 1} de ${pasos.length}`;
+                }, duracionPorPaso * 1000);
+            }
+
+            function cerrarModal() {
+                clearInterval(intervaloActivo);
+                modal.classList.add('hidden');
+            }
+
+            botonCerrarModal.addEventListener('click', cerrarModal);
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) cerrarModal();
+            });
+
+            botonesTab.forEach(boton => {
+                boton.addEventListener('click', () => {
+                    activarTab(boton.dataset.tab);
+                });
+            });
+
+            const tabInicial = new URLSearchParams(window.location.search).get('tab') || 'RESPIRACION';
+            activarTab(tabInicial);
+        });
+    </script>
+
+</body>
+</html>

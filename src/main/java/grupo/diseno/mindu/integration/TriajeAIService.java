@@ -3,39 +3,71 @@ package grupo.diseno.mindu.integration;
 import grupo.diseno.mindu.dto.TriajeChatRequest;
 import grupo.diseno.mindu.dto.TriajeChatResponse;
 import grupo.diseno.mindu.dto.TriajeMensajeDTO;
+import grupo.diseno.mindu.model.TipoNotificacion;
+import grupo.diseno.mindu.repository.EstudianteRepository;
+import grupo.diseno.mindu.service.NotificacionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Locale;
 
 @Service
 @RequiredArgsConstructor
 public class TriajeAIService {
 
     private final OpenAIConnector openAIConnector;
+    private final EstudianteRepository estudianteRepository;
+    private final NotificacionService notificacionService;
 
-    public TriajeChatResponse responder(TriajeChatRequest request) {
+    private static final List<String> PALABRAS_RIESGO = List.of(
+            "suicid", "matarme", "quitarme la vida", "no quiero vivir", "no vale la pena vivir",
+            "hacerme daño", "autolesion", "autolesión", "cortarme", "quiero morir", "acabar con todo"
+    );
+
+    public TriajeChatResponse responder(TriajeChatRequest request, String correoUsuario) {
+        boolean hayRiesgo = detectarRiesgo(request.mensaje());
+
+        if (hayRiesgo) {
+            notificarRiesgo(correoUsuario);
+        }
+
         if (!openAIConnector.estaConfigurado()) {
             return new TriajeChatResponse(
                     "Todavia no tengo configurada la clave de IA en el servidor. Configura OPENAI_API_KEY y vuelve a intentar.",
                     false,
-                    openAIConnector.getModel()
+                    openAIConnector.getModel(),
+                    hayRiesgo
             );
         }
 
         try {
             String respuesta = openAIConnector.generarTexto(instrucciones(), construirConversacion(request));
-            return new TriajeChatResponse(respuesta, true, openAIConnector.getModel());
+            return new TriajeChatResponse(respuesta, true, openAIConnector.getModel(), hayRiesgo);
         } catch (RuntimeException e) {
+            e.printStackTrace();
+            return new TriajeChatResponse(
+                    "ERROR: " + e.getMessage(),
+                    false,
+                    openAIConnector.getModel(),
+                    hayRiesgo
+            );
+        }
+    }
 
-    e.printStackTrace();
+    private boolean detectarRiesgo(String mensaje) {
+        if (mensaje == null) return false;
+        String texto = mensaje.toLowerCase(Locale.ROOT);
+        return PALABRAS_RIESGO.stream().anyMatch(texto::contains);
+    }
 
-    return new TriajeChatResponse(
-        "ERROR: " + e.getMessage(),
-        false,
-        openAIConnector.getModel()
-    );
-}
+    private void notificarRiesgo(String correoUsuario) {
+        estudianteRepository.findByCorreo(correoUsuario).ifPresent(estudiante ->
+                notificacionService.crear(estudiante, TipoNotificacion.ALERTA_BIENESTAR,
+                        "Detectamos que podrías necesitar apoyo",
+                        "En tu conversación de triaje notamos señales de alerta. Te recomendamos agendar una cita con un psicólogo cuanto antes.",
+                        null)
+        );
     }
 
     private String instrucciones() {

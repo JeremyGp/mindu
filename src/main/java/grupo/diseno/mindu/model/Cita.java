@@ -42,7 +42,11 @@ public class Cita {
 
     @PrePersist
     public void prePersist() {
-        estado = EstadoCita.PENDIENTE;
+    estado = EstadoCita.CONFIRMADA;
+    if (recordatorioEnviado == null) recordatorioEnviado = false;
     }
+
+    @Column(nullable = false)
+    private Boolean recordatorioEnviado;
 }
 

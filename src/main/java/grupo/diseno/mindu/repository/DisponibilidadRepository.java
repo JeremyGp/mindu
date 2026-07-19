@@ -12,6 +12,8 @@ import java.util.Optional;
 @Repository
 public interface DisponibilidadRepository extends JpaRepository<Disponibilidad, Long> {
 
+        boolean existsByFechaGreaterThanEqual(LocalDate fecha);
+
     List<Disponibilidad> findByPsicologoIdAndDisponibleTrueAndFechaGreaterThanEqualOrderByFechaAscHoraAsc(
             Long psicologoId, LocalDate fecha);
 
